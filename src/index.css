@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: 10 12 15;
+    --surface: 17 20 24;
+    --raised: 23 27 32;
+    --line: 36 41 48;
+    --ink: 230 237 243;
+    --muted: 139 148 158;
+    --faint: 110 118 129;
+    --accent: 94 212 154;
+    --warn: 227 179 65;
+    --danger: 244 112 103;
+    --info: 108 182 255;
+    --violet: 196 160 255;
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgb(var(--accent) / 0.25);
+    color: rgb(var(--ink));
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-page px-4 sm:px-6 lg:px-8;
+  }
+
+  .label {
+    @apply font-mono text-[11px] uppercase tracking-[0.14em] text-faint;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded border border-line bg-raised/60 px-2 py-0.5 font-mono text-[11px] text-muted;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-md px-4 py-2 font-mono text-[13px] transition-colors duration-200;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-bg hover:bg-accent/85;
+  }
+  .btn-ghost {
+    @apply btn border border-line text-ink hover:border-faint hover:bg-raised;
+  }
+
+  .panel {
+    @apply rounded-lg border border-line bg-surface;
+  }
+
+  /* Grid "blueprint" background at the top of the page */
+  .bg-grid {
+    background-image:
+      linear-gradient(rgb(var(--line) / 0.45) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--line) / 0.45) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%);
+  }
+
+  /* JSON / code syntax tokens */
+  .tok-key { color: rgb(var(--info)); }
+  .tok-str { color: rgb(var(--accent)); }
+  .tok-num { color: rgb(var(--warn)); }
+  .tok-bool { color: rgb(var(--violet)); }
+  .tok-punct { color: rgb(var(--faint)); }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
