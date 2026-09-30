@@ -82,6 +82,19 @@ export const projects: Project[] = [
     ],
     stack: ["Laravel", "PostgreSQL", "Inertia.js", "React"],
     image: reservationImg,
+    diagram: {
+      nodes: [
+        { id: "client", label: "Browser", note: "React via Inertia", col: 0, row: 0 },
+        { id: "app", label: "Laravel", note: "booking + ordering", col: 0, row: 1 },
+        { id: "mail", label: "Mail", note: "confirmation", col: 1, row: 1 },
+        { id: "db", label: "PostgreSQL", note: "bookings, orders", col: 0, row: 2 },
+      ],
+      edges: [
+        { from: "client", to: "app", label: "HTTP" },
+        { from: "app", to: "db", label: "SQL" },
+        { from: "app", to: "mail", label: "send" },
+      ],
+    },
     // TODO: add { label: "Source", href: "https://github.com/..." } if the repo is public.
     links: [],
   },
@@ -99,6 +112,17 @@ export const projects: Project[] = [
     ],
     stack: ["Laravel", "PostgreSQL", "Inertia.js", "React", "Tailwind CSS"],
     image: badmintoonImg,
+    diagram: {
+      nodes: [
+        { id: "client", label: "Browser", note: "React via Inertia", col: 0, row: 0 },
+        { id: "app", label: "Laravel", note: "auth + RBAC, CRUD", col: 0, row: 1 },
+        { id: "db", label: "PostgreSQL", note: "participants, categories, transactions", col: 0, row: 2 },
+      ],
+      edges: [
+        { from: "client", to: "app", label: "HTTP" },
+        { from: "app", to: "db", label: "SQL" },
+      ],
+    },
     links: [],
   },
   // TODO: add the backend projects from the past year here, newest first.

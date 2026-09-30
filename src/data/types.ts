@@ -3,6 +3,15 @@ export interface SkillGroup {
   items: string[];
 }
 
+/**
+ * A small architecture diagram. Nodes sit on a grid (col 0-1, row 0-3);
+ * edges connect node ids. Keep it to what the system really does.
+ */
+export interface Diagram {
+  nodes: { id: string; label: string; note?: string; col: 0 | 1; row: number }[];
+  edges: { from: string; to: string; label?: string }[];
+}
+
 export type ProjectStatus = "in-progress" | "finished";
 
 export interface Project {
@@ -16,6 +25,7 @@ export interface Project {
   work: string[];
   stack: string[];
   image?: string;
+  diagram?: Diagram;
   links?: { label: string; href: string }[];
 }
 

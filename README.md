@@ -1,6 +1,6 @@
 # portofolio-v2
 
-Portfolio of Yusuf Novandra, backend developer. React, Vite, TypeScript, and Tailwind.
+Portfolio of Yusuf Novandra, backend developer. React, Vite, TypeScript, Tailwind, and GSAP.
 
 ```bash
 npm install
@@ -18,12 +18,14 @@ Semua isi ada di satu file: [`src/data/portfolio.ts`](src/data/portfolio.ts). Ko
 | Nama, role, intro, status kerja | `profile` |
 | Yang sedang dipelajari | `profile.learning` (kosong = tidak tampil) |
 | Skill dan tools | `skills` |
-| Project | `projects` (status: `in-progress` atau `finished`) |
+| Project | `projects` (status: `in-progress` atau `finished`; `diagram` untuk diagram arsitektur) |
 | Pengalaman kerja | `experience` (tanggal `"YYYY-MM"`, `end: null` kalau masih bekerja) |
 | Sertifikat, pendidikan, bahasa | `certificates`, `education`, `languages` |
 | Link kontak dan form | `contactLinks`, `contactFormEndpoint` |
 
 Tulis hanya yang benar-benar terjadi. Section yang datanya kosong otomatis disembunyikan.
+
+Terminal di hero otomatis menjawab dari data yang sama, jadi tidak perlu diubah terpisah.
 
 Gambar atau PDF baru: taruh di `src/assets/`, `import` di bagian atas `portfolio.ts`, lalu pakai di data.
 

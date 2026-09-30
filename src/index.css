@@ -4,6 +4,18 @@
 
 @layer base {
   :root {
+    --paper: 22 21 19;
+    --raised: 33 31 28;
+    --ink: 235 231 222;
+    --muted: 168 162 152;
+    --rule: 52 50 45;
+    --edge: 122 116 106;
+    --accent: 226 138 109;
+    --on-accent: 22 21 19;
+    color-scheme: dark;
+  }
+
+  :root.light {
     --paper: 246 244 239;
     --raised: 238 235 227;
     --ink: 29 28 26;
@@ -15,16 +27,14 @@
     color-scheme: light;
   }
 
-  :root.dark {
-    --paper: 22 21 19;
-    --raised: 33 31 28;
-    --ink: 235 231 222;
-    --muted: 168 162 152;
-    --rule: 52 50 45;
-    --edge: 122 116 106;
-    --accent: 226 138 109;
-    --on-accent: 22 21 19;
-    color-scheme: dark;
+  /* The terminal keeps its own dark surface in both themes (a deliberate focal point). */
+  :root,
+  :root.light {
+    --term-bg: 22 21 19;
+    --term-ink: 235 231 222;
+    --term-muted: 168 162 152;
+    --term-accent: 226 138 109;
+    --term-rule: 52 50 45;
   }
 
   html {

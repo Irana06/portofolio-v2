@@ -10,11 +10,11 @@ const LINKS = [
 ];
 
 function useTheme() {
-  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
+  const [dark, setDark] = useState(() => !document.documentElement.classList.contains("light"));
 
   const toggle = () => {
     const next = !dark;
-    document.documentElement.classList.toggle("dark", next);
+    document.documentElement.classList.toggle("light", !next);
     try {
       localStorage.setItem("theme", next ? "dark" : "light");
     } catch {

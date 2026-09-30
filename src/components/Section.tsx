@@ -21,7 +21,7 @@ export default function Section({
     <section id={id} aria-labelledby={`${id}-title`} className={`border-t border-rule ${spacing}`}>
       <div className="page grid gap-6 md:grid-cols-[10rem_1fr] md:gap-12">
         <header>
-          <p className="meta">§ {number}</p>
+          <p className="font-mono text-[13px] text-accent">§ {number}</p>
           <h2 id={`${id}-title`} className="mt-1 text-2xl font-medium leading-tight md:text-[1.7rem]">
             {title}
           </h2>
