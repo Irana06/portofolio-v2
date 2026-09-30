@@ -1,49 +1,37 @@
-# yusufnova — backend portfolio (v2)
+# portofolio-v2
 
-Portfolio yang fokus ke backend: tema gelap, gaya terminal / API docs, dibangun dengan React + Vite + TypeScript + Tailwind.
+Portfolio of Yusuf Novandra, backend developer. React, Vite, TypeScript, and Tailwind.
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm run build    # typecheck + build ke dist/
+npm run build    # typecheck and build to dist/
 npm run lint
 ```
 
-## Cara update konten
+## Mengubah konten
 
-**Semua konten ada di satu file: [`src/data/portfolio.ts`](src/data/portfolio.ts).**
-Komponen tidak perlu disentuh. Cari `TODO` untuk bagian yang perlu diisi.
+Semua isi ada di satu file: [`src/data/portfolio.ts`](src/data/portfolio.ts). Komponen tidak perlu disentuh. Cari `TODO` untuk bagian yang masih perlu diisi.
 
-| Mau ubah…                     | Edit bagian              |
-| ----------------------------- | ------------------------ |
-| Nama, role, tagline, about    | `profile`                |
-| Status "open to work"         | `profile.available`      |
-| Skill / tech stack            | `stack` (level: `daily` · `proficient` · `familiar` · `learning`) |
-| Project                       | `projects` (status: `live` → 200, `in-progress` → 202, `archived` → 410) |
-| Pengalaman kerja              | `experience` (tanggal `"YYYY-MM"`, `end: null` = masih bekerja) |
-| Sertifikat                    | `certificates`           |
-| Pendidikan, bahasa            | `education`, `languages` |
-| Sosmed & kontak               | `socials`, `contactFormEndpoint` |
+| Mau ubah | Edit bagian |
+| --- | --- |
+| Nama, role, intro, status kerja | `profile` |
+| Yang sedang dipelajari | `profile.learning` (kosong = tidak tampil) |
+| Skill dan tools | `skills` |
+| Project | `projects` (status: `in-progress` atau `finished`) |
+| Pengalaman kerja | `experience` (tanggal `"YYYY-MM"`, `end: null` kalau masih bekerja) |
+| Sertifikat, pendidikan, bahasa | `certificates`, `education`, `languages` |
+| Link kontak dan form | `contactLinks`, `contactFormEndpoint` |
 
-Angka seperti total tahun pengalaman, jumlah project, dan sertifikat dihitung otomatis dari data.
+Tulis hanya yang benar-benar terjadi. Section yang datanya kosong otomatis disembunyikan.
 
-### Menambah gambar / file
+Gambar atau PDF baru: taruh di `src/assets/`, `import` di bagian atas `portfolio.ts`, lalu pakai di data.
 
-Taruh file di `src/assets/...`, `import` di bagian atas `portfolio.ts`, lalu pakai di data
-(lihat contoh `badmintoonImg` atau `certInternship`).
+## Desain
 
-## Struktur
-
-```
-src/
-├── data/          # ← konten (portfolio.ts) + tipe data
-├── sections/      # Hero, About, Stack, Projects, Experience, Certificates, Contact
-├── components/    # Navbar, Footer, UI primitives (Window, SectionHeader, …)
-├── pages/         # /cv (CV siap print) dan 404
-└── lib/           # helper format tanggal & durasi
-```
+Arah desain dan alasan tiap keputusan ada di [`DESIGN.md`](DESIGN.md). Aturan anti "AI slop" dari [antislop](https://github.com/miqdadbadjuber/anti-slop) ada di `.claude/skills/` dan otomatis dibaca Claude Code lewat `CLAUDE.md`.
 
 ## Halaman
 
-- `/` — portfolio utama
-- `/cv` — CV bersih berbasis data yang sama, bisa di-print / save as PDF
+- `/`: portfolio
+- `/cv`: CV dari data yang sama, siap print atau simpan sebagai PDF

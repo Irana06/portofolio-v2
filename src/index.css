@@ -4,109 +4,76 @@
 
 @layer base {
   :root {
-    --bg: 10 12 15;
-    --surface: 17 20 24;
-    --raised: 23 27 32;
-    --line: 36 41 48;
-    --ink: 230 237 243;
-    --muted: 139 148 158;
-    --faint: 110 118 129;
-    --accent: 94 212 154;
-    --warn: 227 179 65;
-    --danger: 244 112 103;
-    --info: 108 182 255;
-    --violet: 196 160 255;
+    --paper: 246 244 239;
+    --raised: 238 235 227;
+    --ink: 29 28 26;
+    --muted: 90 85 76;
+    --rule: 216 211 200;
+    --edge: 138 131 120;
+    --accent: 155 44 31;
+    --on-accent: 246 244 239;
+    color-scheme: light;
+  }
+
+  :root.dark {
+    --paper: 22 21 19;
+    --raised: 33 31 28;
+    --ink: 235 231 222;
+    --muted: 168 162 152;
+    --rule: 52 50 45;
+    --edge: 122 116 106;
+    --accent: 226 138 109;
+    --on-accent: 22 21 19;
     color-scheme: dark;
   }
 
   html {
-    scroll-behavior: smooth;
     scroll-padding-top: 5rem;
   }
 
   body {
-    @apply bg-bg font-sans text-ink antialiased;
-    font-feature-settings: "cv11", "ss01";
-    text-rendering: optimizeLegibility;
+    @apply bg-paper font-serif text-ink antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  a {
+    @apply underline decoration-rule decoration-1 underline-offset-[3px] transition-colors hover:decoration-accent;
   }
 
   ::selection {
-    background: rgb(var(--accent) / 0.25);
-    color: rgb(var(--ink));
+    background: rgb(var(--accent) / 0.2);
   }
 
   :focus-visible {
     outline: 2px solid rgb(var(--accent));
-    outline-offset: 2px;
-    border-radius: 4px;
+    outline-offset: 3px;
   }
 
-  @media (prefers-reduced-motion: reduce) {
+  @media (prefers-reduced-motion: no-preference) {
     html {
-      scroll-behavior: auto;
-    }
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.001ms !important;
+      scroll-behavior: smooth;
     }
   }
 }
 
 @layer components {
-  .container-page {
-    @apply mx-auto w-full max-w-page px-4 sm:px-6 lg:px-8;
+  .page {
+    @apply mx-auto w-full max-w-5xl px-5 sm:px-8;
   }
 
-  .label {
-    @apply font-mono text-[11px] uppercase tracking-[0.14em] text-faint;
-  }
-
-  .chip {
-    @apply inline-flex items-center rounded border border-line bg-raised/60 px-2 py-0.5 font-mono text-[11px] text-muted;
+  /* Small UI text: navigation, dates, metadata */
+  .meta {
+    @apply font-sans text-sm text-muted;
   }
 
   .btn {
-    @apply inline-flex items-center gap-2 rounded-md px-4 py-2 font-mono text-[13px] transition-colors duration-200;
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-sm px-5 font-sans text-[15px] font-medium no-underline transition-colors;
   }
   .btn-primary {
-    @apply btn bg-accent text-bg hover:bg-accent/85;
+    @apply btn bg-accent text-on-accent hover:bg-ink hover:text-paper;
   }
-  .btn-ghost {
-    @apply btn border border-line text-ink hover:border-faint hover:bg-raised;
-  }
-
-  .panel {
-    @apply rounded-lg border border-line bg-surface;
-  }
-
-  /* Grid "blueprint" background at the top of the page */
-  .bg-grid {
-    background-image:
-      linear-gradient(rgb(var(--line) / 0.45) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(var(--line) / 0.45) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%);
-  }
-
-  /* JSON / code syntax tokens */
-  .tok-key { color: rgb(var(--info)); }
-  .tok-str { color: rgb(var(--accent)); }
-  .tok-num { color: rgb(var(--warn)); }
-  .tok-bool { color: rgb(var(--violet)); }
-  .tok-punct { color: rgb(var(--faint)); }
-
-  /* Scroll reveal */
-  .reveal {
-    opacity: 0;
-    transform: translateY(12px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .reveal.is-visible {
-    opacity: 1;
-    transform: none;
+  .btn-plain {
+    @apply btn border border-edge text-ink hover:border-ink;
   }
 }

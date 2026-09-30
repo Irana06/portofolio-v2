@@ -1,33 +1,22 @@
-export type Level = "daily" | "proficient" | "familiar" | "learning";
-
-export interface StackItem {
-  name: string;
-  level: Level;
-}
-
-export interface StackGroup {
-  /** Nama grup, tampil sebagai key di "stack.yaml" */
-  key: string;
+export interface SkillGroup {
   label: string;
-  items: StackItem[];
+  items: string[];
 }
 
-export type ProjectStatus = "live" | "in-progress" | "archived";
+export type ProjectStatus = "in-progress" | "finished";
 
 export interface Project {
   slug: string;
   name: string;
-  /** Satu kalimat ringkas tentang apa yang dikerjakan service ini */
-  summary: string;
-  /** Poin teknis: arsitektur, keputusan desain, optimasi, dll. */
-  highlights: string[];
-  stack: string[];
-  status: ProjectStatus;
   year: string;
-  /** Metrik opsional, misal { label: "p95 latency", value: "120ms" } */
-  metrics?: { label: string; value: string }[];
-  links?: { label: string; href: string }[];
+  status: ProjectStatus;
+  /** One or two sentences: what the system does and who uses it */
+  summary: string;
+  /** What you built. Only list work you actually did. */
+  work: string[];
+  stack: string[];
   image?: string;
+  links?: { label: string; href: string }[];
 }
 
 export interface Experience {
@@ -36,9 +25,9 @@ export interface Experience {
   companyUrl?: string;
   location: string;
   type: string;
-  /** Format "YYYY-MM" supaya bisa diurutkan & ditampilkan seperti log */
+  /** "YYYY-MM" */
   start: string;
-  /** Kosongkan / isi null jika masih bekerja di sana */
+  /** "YYYY-MM", or null if you still work there */
   end: string | null;
   points: string[];
   stack: string[];
@@ -47,8 +36,7 @@ export interface Experience {
 export interface Certificate {
   name: string;
   issuer: string;
-  category: string;
-  /** Format "YYYY-MM" */
+  /** "YYYY-MM" */
   date: string;
   image?: string;
   file?: string;
@@ -60,9 +48,8 @@ export interface Education {
   period: string;
 }
 
-export interface Social {
+export interface ContactLink {
   label: string;
   handle: string;
   href: string;
-  icon: "github" | "linkedin" | "telegram" | "instagram" | "mail" | "whatsapp";
 }

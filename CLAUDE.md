@@ -1,6 +1,6 @@
 # portofolio-v2
 
-Backend-focused portfolio. React + Vite + TypeScript + Tailwind. All content lives in `src/data/portfolio.ts`.
+Portfolio site. React + Vite + TypeScript + Tailwind. All content lives in `src/data/portfolio.ts`; design direction lives in `DESIGN.md` (read it before UI work).
 
 Checks before pushing: `npm run build` and `npm run lint`.
 
