@@ -68,8 +68,14 @@
 }
 
 @layer components {
+  /* Full-width layout: content runs edge to edge with a gutter that grows with the screen. */
   .page {
-    @apply mx-auto w-full max-w-5xl px-5 sm:px-8;
+    @apply w-full px-5 sm:px-8 lg:px-14 xl:px-20 2xl:px-28;
+  }
+
+  /* Keep long-form text at a readable line length inside the full-width layout. */
+  .prose-measure {
+    max-width: 68ch;
   }
 
   /* Small UI text: navigation, dates, metadata */

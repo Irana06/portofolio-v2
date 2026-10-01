@@ -27,6 +27,8 @@ Tulis hanya yang benar-benar terjadi. Section yang datanya kosong otomatis disem
 
 Terminal di hero otomatis menjawab dari data yang sama, jadi tidak perlu diubah terpisah.
 
+Isi section "Inside a request" (langkah dan potongan kode) ada di [`src/data/journey.ts`](src/data/journey.ts).
+
 Gambar atau PDF baru: taruh di `src/assets/`, `import` di bagian atas `portfolio.ts`, lalu pakai di data.
 
 ## Desain

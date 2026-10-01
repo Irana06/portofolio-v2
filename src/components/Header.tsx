@@ -3,6 +3,7 @@ import { profile } from "../data/portfolio";
 
 const LINKS = [
   { href: "#projects", label: "Projects" },
+  { href: "#journey", label: "Request flow" },
   { href: "#experience", label: "Experience" },
   { href: "#skills", label: "Skills" },
   { href: "#contact", label: "Contact" },

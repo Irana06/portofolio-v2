@@ -29,7 +29,7 @@ export default function Contact() {
   }
 
   return (
-    <Section id="contact" number={5} title="Contact" spacing="py-16 md:py-24">
+    <Section id="contact" number={6} title="Contact" spacing="py-16 md:py-24">
       <p className="text-xl md:text-2xl">
         Email is the quickest way to reach me:
         <a href={`mailto:${profile.email}`} className="mt-1 block w-fit decoration-accent [overflow-wrap:anywhere]">

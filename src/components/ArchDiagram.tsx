@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import type { Diagram } from "../data/types";
 import { gsap } from "../lib/gsap";
 
@@ -31,6 +31,8 @@ function wrap(text: string, width: number): string[] {
  */
 export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name: string }) {
   const root = useRef<SVGSVGElement>(null);
+  const [active, setActive] = useState<string | null>(null);
+  const [canMove, setCanMove] = useState(false);
 
   const twoCols = diagram.nodes.some((n) => n.col === 1);
   const W = 300;
@@ -87,6 +89,7 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
     const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
+      setCanMove(true);
       const paths = gsap.utils.toArray<SVGPathElement>(svg.querySelectorAll("[data-edge]"));
       const nodes = gsap.utils.toArray<SVGGElement>(svg.querySelectorAll("[data-node]"));
       const labels = gsap.utils.toArray<SVGTextElement>(svg.querySelectorAll("[data-edge-label]"));
@@ -113,24 +116,53 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
           .to(target ?? {}, { opacity: 1, duration: 0.3 }, ">-0.1");
       });
       tl.to(dot, { opacity: 0, duration: 0.3 });
+      return () => setCanMove(false);
     });
 
     return () => mm.revert();
   }, [diagram]);
 
+  /** Sends one request dot through every connection, in order, on demand. */
+  function replay() {
+    const svg = root.current;
+    if (!svg) return;
+    const paths = gsap.utils.toArray<SVGPathElement>(svg.querySelectorAll("[data-edge]"));
+    const dot = svg.querySelector<SVGCircleElement>("[data-replay-dot]");
+    gsap.set(paths, { strokeDashoffset: 0 });
+    gsap.set(svg.querySelectorAll("[data-node],[data-edge-label]"), { opacity: 1 });
+    const tl = gsap.timeline();
+    tl.set(dot, { opacity: 1 });
+    paths.forEach((p, i) => {
+      const id = diagram.edges[i].to;
+      tl.to(dot, { duration: 0.7, ease: "power1.inOut", motionPath: { path: p, align: p, alignOrigin: [0.5, 0.5] } })
+        .call(() => setActive(id))
+        .to({}, { duration: 0.25 });
+    });
+    tl.to(dot, { opacity: 0, duration: 0.2 }).call(() => setActive(null));
+  }
+
+  const lit = (from: string, to: string) => active !== null && (from === active || to === active);
+
   return (
+    <div className="w-full max-w-[24rem]">
     <svg
       ref={root}
       viewBox={`0 0 ${W} ${H}`}
-      role="img"
+      role="group"
       aria-label={`Architecture of ${name}: ${label}`}
-      className="w-full max-w-[22rem] font-mono"
+      className="w-full font-mono"
     >
       {edges.map((e) => (
         <g key={`${e.from}-${e.to}`}>
-          <path data-edge d={e.d} fill="none" className="stroke-edge" strokeWidth={1.25} />
+          <path
+            data-edge
+            d={e.d}
+            fill="none"
+            className={`transition-[stroke] duration-200 ${lit(e.from, e.to) ? "stroke-accent" : "stroke-edge"}`}
+            strokeWidth={lit(e.from, e.to) ? 2 : 1.25}
+          />
           {e.label && (
-            <text data-edge-label x={e.lx} y={e.ly} className="fill-muted" fontSize={10}>
+            <text data-edge-label x={e.lx} y={e.ly} className={lit(e.from, e.to) ? "fill-accent" : "fill-muted"} fontSize={10}>
               {e.label}
             </text>
           )}
@@ -141,8 +173,29 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
         const b = box[n.id];
         const notes = n.note ? wrap(n.note, b.w) : [];
         return (
-          <g key={n.id} data-node={n.id}>
-            <rect x={b.x} y={b.y} width={b.w} height={NODE_H} rx={4} className="fill-raised stroke-edge" strokeWidth={1} />
+          <g
+            key={n.id}
+            data-node={n.id}
+            tabIndex={0}
+            role="button"
+            aria-pressed={active === n.id}
+            aria-label={`${n.label}${n.note ? `, ${n.note}` : ""}. Highlight its connections`}
+            onMouseEnter={() => setActive(n.id)}
+            onMouseLeave={() => setActive(null)}
+            onFocus={() => setActive(n.id)}
+            onBlur={() => setActive(null)}
+            onClick={() => setActive((a) => (a === n.id ? null : n.id))}
+            className="cursor-pointer outline-none [&:focus-visible>rect]:stroke-accent [&:focus-visible>rect]:[stroke-width:2]"
+          >
+            <rect
+              x={b.x}
+              y={b.y}
+              width={b.w}
+              height={NODE_H}
+              rx={4}
+              className={`fill-raised transition-[stroke] duration-200 ${active === n.id ? "stroke-accent" : "stroke-edge"}`}
+              strokeWidth={active === n.id ? 2 : 1}
+            />
             <text x={b.x + 10} y={b.y + 22} className="fill-ink" fontSize={13}>
               {n.label}
             </text>
@@ -156,6 +209,16 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
       })}
 
       <circle data-dot r={4} cx={0} cy={0} opacity={0} className="fill-accent" />
+      <circle data-replay-dot r={5} cx={0} cy={0} opacity={0} className="fill-accent" />
     </svg>
+    <div className="mt-3 flex flex-wrap items-center gap-3 font-mono text-[12px] text-muted">
+      {canMove && (
+        <button type="button" onClick={replay} className="min-h-[44px] rounded-sm border border-edge px-3 text-ink hover:border-accent hover:text-accent">
+          replay request
+        </button>
+      )}
+      <span>hover or tap a box to trace it</span>
+    </div>
+    </div>
   );
 }

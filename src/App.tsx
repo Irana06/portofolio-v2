@@ -2,6 +2,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Intro from "./sections/Intro";
 import Projects from "./sections/Projects";
+import Journey from "./sections/Journey";
+import ScrollProgress from "./components/ScrollProgress";
 import Experience from "./sections/Experience";
 import Skills from "./sections/Skills";
 import Certificates from "./sections/Certificates";
@@ -16,10 +18,12 @@ export default function App() {
       >
         Skip to content
       </a>
+      <ScrollProgress />
       <Header />
       <main>
         <Intro />
         <Projects />
+        <Journey />
         <Experience />
         <Skills />
         <Certificates />

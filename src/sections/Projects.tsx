@@ -1,5 +1,6 @@
 import { projects } from "../data/portfolio";
 import ArchDiagram from "../components/ArchDiagram";
+import ParallaxImage from "../components/ParallaxImage";
 import Section from "../components/Section";
 
 const STATUS_LABEL = { "in-progress": "in progress", finished: "finished" } as const;
@@ -11,13 +12,13 @@ export default function Projects() {
     <Section id="projects" number={1} title="Projects" spacing="py-16 md:py-24">
       <div className="divide-y divide-rule">
         {projects.map((p) => (
-          <article key={p.slug} className="grid gap-8 py-12 first:pt-0 last:pb-0 lg:grid-cols-[1fr_20rem] lg:gap-12">
+          <article key={p.slug} className="grid gap-8 py-12 first:pt-0 last:pb-0 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_26rem] xl:gap-20">
             <div>
               <p className="font-mono text-[13px] text-muted">
                 {p.year} · {STATUS_LABEL[p.status]}
               </p>
               <h3 className="mt-1 text-[1.7rem] font-medium leading-snug">{p.name}</h3>
-              <p className="mt-4">{p.summary}</p>
+              <p className="prose-measure mt-4">{p.summary}</p>
 
               <p className="mt-6 font-sans text-sm font-medium">What I built</p>
               <ul className="mt-2 list-disc space-y-1.5 pl-5 marker:text-muted">
@@ -54,7 +55,7 @@ export default function Projects() {
               )}
               {p.image && (
                 <figure>
-                  <img src={p.image} alt={`Screenshot of ${p.name}`} loading="lazy" className="w-full rounded-sm border border-rule" />
+                  <ParallaxImage src={p.image} alt={`Screenshot of ${p.name}`} />
                   <figcaption className="mt-2 font-mono text-[12px] text-muted">screenshot</figcaption>
                 </figure>
               )}

@@ -5,7 +5,8 @@ Chosen by the owner (Yusuf). Future UI work on this repo follows this file, and 
 - **Feel:** a backend engineer's portfolio. Editorial typography carries the reading; the backend and DevOps character comes from real technical content (a working terminal, architecture diagrams, stack labels), not from decoration.
 - **Theme:** dark by default (the audience is technical and the owner wants a dev feel), with a working light mode toggle saved per visitor.
 - **Motion:** GSAP ScrollTrigger, requested by the owner.
-- **Dial:** ENERGY 2 / RHYTHM 2 / MOTION 3
+- **Layout:** full width (owner request, 2026-10-01). Content runs edge to edge with a growing side gutter; long text keeps a 68ch measure.
+- **Dial:** ENERGY 3 / RHYTHM 3 / MOTION 3 (raised by the owner, who found the calmer version plain)
 
 ## Owner overrides (antislop R-37)
 
@@ -25,6 +26,12 @@ Chosen by the owner (Yusuf). Future UI work on this repo follows this file, and 
 | Terminal keeps a dark surface in both themes | It is the one focal point of the hero |
 | Architecture diagram per project, drawn on scroll with a travelling request dot | Motion with a purpose: it shows the order data moves through the system. Scrubbed to scroll, never looping |
 | Experience timeline line fills on scroll | Shows the reader where they are in the timeline |
+| "Inside a request" pinned section (desktop) | Scrolling moves one booking request sideways through each layer of the stack, with a rail showing the current layer. It shows backend thinking instead of claiming it. Plain list on phones and with reduced motion |
+| Diagram nodes highlight their connections on hover/tap; "replay request" button | Lets the visitor trace the flow themselves instead of only watching it |
+| Skill explorer | Each skill shows the real projects and jobs that use it, computed from the data; an honest empty state when none do |
+| Name rises letter by letter on load; section titles slide in once | Sets the pace at the top of each part of the page, runs once |
+| Reading progress bar | Shows how much of the page is left |
+| Screenshot parallax, certificate preview following the cursor (desktop) | Depth and a quick look without opening the dialog |
 | All motion off under `prefers-reduced-motion` | Diagrams and timeline render complete and static |
 | No icon library | Every control has a text label |
 
