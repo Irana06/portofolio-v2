@@ -43,6 +43,16 @@ export default function Experience() {
               )}
             </h3>
             {e.location && <p className="font-sans text-sm text-muted">{e.location}</p>}
+            {(e.note || e.links?.length) && (
+              <p className="mt-2 font-sans text-sm text-muted">
+                {e.note}
+                {e.links?.map((l) => (
+                  <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className="ml-2 text-ink">
+                    {l.label}
+                  </a>
+                ))}
+              </p>
+            )}
             {e.points.length > 0 && (
               <ul className="mt-4 list-disc space-y-1.5 pl-5 marker:text-muted">
                 {e.points.map((pt) => (

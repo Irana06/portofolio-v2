@@ -40,7 +40,7 @@ export const profile = {
   intro:
     "I build web applications with Laravel and PostgreSQL. I started out as a full-stack developer shipping Laravel and React apps end to end, and the part I keep coming back to is the backend: how the data is modelled, how the queries run, and what the API hands to the frontend.",
   about: [
-    "Since February 2026 I've worked in Project Development at CV Genta Sandi Mandiri, first as a trainee and from April as an internal employee.",
+    "Since February 2026 I've worked in Project Development at CV Genta Sandi Mandiri, first as a trainee and from April as an internal employee, on projects for GSM and Script Media: Laravel e-commerce and LMS builds, WordPress sites, client maintenance, and fixing servers that had been hacked.",
     "Before that I did a six-month programmer internship at PT Javan Cipta Solusi in Sleman, working on internal and client applications with Laravel, React, and PostgreSQL alongside senior developers.",
     "I'm currently studying Information Systems at Universitas Terbuka.",
   ],
@@ -60,9 +60,9 @@ export const contactFormEndpoint = "https://formspree.io/f/mpwyzgrn";
 
 export const skills: SkillGroup[] = [
   { label: "Languages", items: ["PHP", "SQL", "TypeScript", "JavaScript"] },
-  { label: "Backend", items: ["Laravel", "REST APIs", "Authentication and role-based access", "Livewire", "Backend problem solving"] },
+  { label: "Backend", items: ["Laravel", "REST APIs", "Authentication and role-based access", "Livewire", "WordPress", "Backend problem solving"] },
   { label: "Data", items: ["PostgreSQL", "Query optimisation", "DBeaver"] },
-  { label: "Deployment", items: ["Railway", "Cloudflare Tunnel (setting up)", "Docker", "Ubuntu", "FileZilla"] },
+  { label: "Deployment and servers", items: ["Fixing hacked servers", "Railway", "Cloudflare Tunnel (setting up)", "Docker", "Ubuntu", "FileZilla"] },
   { label: "Tooling", items: ["Git, GitHub, GitLab", "Claude Code", "Postman"] },
   { label: "Frontend, when needed", items: ["React", "Inertia.js", "Tailwind CSS"] },
   // TODO: add the tools you picked up this year.
@@ -133,18 +133,25 @@ export const experience: Experience[] = [
   {
     role: "Project Development",
     company: "CV Genta Sandi Mandiri",
-    // TODO: add location: "...", and companyUrl if the company has a website
+    // TODO: add companyUrl once you remember the GSM website
+    location: "Mergangsan, Yogyakarta",
     type: "Internal employee",
     start: "2026-04",
     end: "2026-10",
-    // TODO: 2 to 4 things you built or own here. Empty lists are hidden on the site.
-    points: [],
-    // TODO: the stack you use here, e.g. ["Laravel", "PostgreSQL"]
-    stack: [],
+    note: "Contracted by CV Genta Sandi Mandiri. I also work on projects for Script Media.",
+    links: [{ label: "script-media.net", href: "https://script-media.net" }],
+    points: [
+      "Built an e-commerce site and a learning management system (LMS) with Laravel",
+      "Developed websites with WordPress",
+      "Maintained existing client projects and fixed bugs in them",
+      "Fixed servers that had been hacked",
+    ],
+    stack: ["Laravel", "PHP", "WordPress"],
   },
   {
     role: "Project Development (training)",
     company: "CV Genta Sandi Mandiri",
+    location: "Mergangsan, Yogyakarta",
     type: "Training",
     start: "2026-02",
     end: "2026-04",

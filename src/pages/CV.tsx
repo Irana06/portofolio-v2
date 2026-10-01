@@ -81,6 +81,7 @@ export default function CV() {
                     {formatYm(e.start)} to {formatYm(e.end)}
                   </p>
                 </div>
+                {e.note && <p className="mt-0.5 text-[13.5px] text-neutral-700">{e.note}</p>}
                 {e.points.length > 0 && (
                   <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-[14.5px] leading-relaxed">
                     {e.points.map((p) => (

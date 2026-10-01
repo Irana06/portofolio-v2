@@ -39,6 +39,9 @@ export interface Experience {
   start: string;
   /** "YYYY-MM", or null if you still work there */
   end: string | null;
+  /** Optional one-line context under the company, e.g. a second company you work for */
+  note?: string;
+  links?: { label: string; href: string }[];
   points: string[];
   stack: string[];
 }
