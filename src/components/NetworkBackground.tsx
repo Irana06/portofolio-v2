@@ -1,21 +1,44 @@
 import { useEffect, useRef } from "react";
 
-type Node = { x: number; y: number; vx: number; vy: number; r: number };
-type Packet = { a: number; b: number; t: number };
+type Layer = 0 | 1 | 2; // 0 far, 1 mid, 2 near
+type Tint = "dot" | "ink" | "accent";
+type Star = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  r: number;
+  layer: Layer;
+  tint: Tint;
+  phase: number; // twinkle offset
+  speed: number; // twinkle speed
+  hub: boolean;
+};
+type Packet = { a: number; b: number; t: number; v: number };
+type Ripple = { x: number; y: number; t: number };
+type Meteor = { x: number; y: number; vx: number; vy: number; life: number };
 
-const LINK = 140; // px: nodes closer than this are connected
-const CURSOR_REACH = 170; // px: nodes inside this radius link to the cursor and drift away from it
+const LINK = 135; // px: mid/near stars closer than this are linked
+const CURSOR_REACH = 170;
+const LAYER = [
+  { size: [0.4, 0.9], speed: 0.06, alpha: 0.45, parallax: 0.08, pull: 0.15 },
+  { size: [0.9, 1.5], speed: 0.16, alpha: 0.65, parallax: 0.2, pull: 0.45 },
+  { size: [1.4, 2.2], speed: 0.28, alpha: 0.85, parallax: 0.38, pull: 0.8 },
+] as const;
+const INTERACTIVE = "a, button, input, textarea, select, label, summary, [role='button'], [role='dialog'], pre, code";
 
 function readColor(name: string) {
-  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim().split(/\s+/).join(",");
-  return `rgb(${v})`;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim().split(/\s+/).join(",");
 }
 
+const rand = (a: number, b: number) => a + Math.random() * (b - a);
+
 /**
- * Background "network": nodes drift, link up when they're close, and now and then a packet
- * travels along a link, the same request motif as the project diagrams. Nodes near the
- * cursor link to it and move aside. Static single frame under reduced motion; paused
- * while the tab is hidden.
+ * Background sky of the page. Three depth layers of stars twinkle and drift with parallax;
+ * mid and near stars link up into a network, a few larger hubs pulse, packets with short
+ * trails hop along links (the request motif), and a meteor crosses now and then. Stars near
+ * the cursor link to it and move aside; clicking empty space sends a ripple and a burst of
+ * packets. A still frame under reduced motion; paused while the tab is hidden.
  */
 export default function NetworkBackground() {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -26,16 +49,37 @@ export default function NetworkBackground() {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let w = 0;
     let h = 0;
-    let nodes: Node[] = [];
+    let stars: Star[] = [];
     let packets: Packet[] = [];
-    let colors = { dot: "", line: "", accent: "" };
-    const mouse = { x: -9999, y: -9999 };
+    let ripples: Ripple[] = [];
+    let meteors: Meteor[] = [];
+    let c = { dot: "", ink: "", line: "", accent: "" };
+    const mouse = { x: -9999, y: -9999, px: 0, py: 0 }; // px/py: smoothed offset from centre, for parallax
     let lastScroll = window.scrollY;
     let raf = 0;
     let lastPacket = 0;
+    let nextMeteor = performance.now() + rand(3000, 7000);
 
     const loadColors = () => {
-      colors = { dot: readColor("--muted"), line: readColor("--edge"), accent: readColor("--accent") };
+      c = { dot: readColor("--muted"), ink: readColor("--ink"), line: readColor("--edge"), accent: readColor("--accent") };
+    };
+    const rgba = (rgb: string, a: number) => `rgba(${rgb},${a})`;
+
+    const makeStar = (layer: Layer, hub = false): Star => {
+      const L = LAYER[layer];
+      const roll = Math.random();
+      return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: rand(-1, 1) * L.speed,
+        vy: rand(-1, 1) * L.speed,
+        r: hub ? rand(2.4, 3.2) : rand(L.size[0], L.size[1]),
+        layer,
+        tint: hub || roll < 0.1 ? "accent" : roll < 0.3 ? "ink" : "dot",
+        phase: Math.random() * Math.PI * 2,
+        speed: rand(0.6, 1.8),
+        hub,
+      };
     };
 
     const resize = () => {
@@ -47,104 +91,207 @@ export default function NetworkBackground() {
       el.style.width = `${w}px`;
       el.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.min(110, Math.round((w * h) / 15000));
-      nodes = Array.from({ length: count }, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        r: 1 + Math.random() * 1.1,
-      }));
+      const area = (w * h) / 10000;
+      const far = Math.min(90, Math.round(area * 0.55));
+      const mid = Math.min(60, Math.round(area * 0.38));
+      const near = Math.min(22, Math.round(area * 0.14));
+      const hubs = w < 640 ? 2 : 4;
+      stars = [
+        ...Array.from({ length: far }, () => makeStar(0)),
+        ...Array.from({ length: mid }, () => makeStar(1)),
+        ...Array.from({ length: near }, () => makeStar(2)),
+        ...Array.from({ length: hubs }, () => makeStar(1, true)),
+      ];
       packets = [];
+    };
+
+    // Screen position including parallax from the cursor (near layers shift more).
+    const pos = (s: Star) => {
+      const k = LAYER[s.layer].pull * 18;
+      return { x: s.x - mouse.px * k, y: s.y - mouse.py * k };
+    };
+
+    const sendPacket = (a: number, b: number) => {
+      if (packets.length < 14) packets.push({ a, b, t: 0, v: rand(0.012, 0.022) });
     };
 
     const draw = (now: number) => {
       ctx.clearRect(0, 0, w, h);
+      const time = now / 1000;
 
-      // Scrolling nudges the field the opposite way, giving the page some depth.
-      const dy = (window.scrollY - lastScroll) * 0.25;
+      const dy = reduced ? 0 : window.scrollY - lastScroll;
       lastScroll = window.scrollY;
-
-      for (const n of nodes) {
-        if (!reduced) {
-          const mx = n.x - mouse.x;
-          const my = n.y - mouse.y;
-          const md = Math.hypot(mx, my);
-          if (md < CURSOR_REACH && md > 0) {
-            const push = (1 - md / CURSOR_REACH) * 0.6;
-            n.x += (mx / md) * push;
-            n.y += (my / md) * push;
-          }
-          n.x += n.vx;
-          n.y += n.vy - dy;
-          if (n.x < -20) n.x = w + 20;
-          if (n.x > w + 20) n.x = -20;
-          if (n.y < -20) n.y = h + 20;
-          if (n.y > h + 20) n.y = -20;
-        }
+      if (!reduced) {
+        const tx = mouse.x < 0 ? 0 : (mouse.x - w / 2) / w;
+        const ty = mouse.y < 0 ? 0 : (mouse.y - h / 2) / h;
+        mouse.px += (tx - mouse.px) * 0.05;
+        mouse.py += (ty - mouse.py) * 0.05;
       }
 
-      // Links between nearby nodes
+      // Move
+      for (const s of stars) {
+        if (reduced) continue;
+        const L = LAYER[s.layer];
+        if (s.layer > 0) {
+          const p = pos(s);
+          const mx = p.x - mouse.x;
+          const my = p.y - mouse.y;
+          const md = Math.hypot(mx, my);
+          if (md < CURSOR_REACH && md > 0) {
+            const push = (1 - md / CURSOR_REACH) * 0.5 * L.pull;
+            s.x += (mx / md) * push;
+            s.y += (my / md) * push;
+          }
+        }
+        s.x += s.vx;
+        s.y += s.vy - dy * L.parallax;
+        if (s.x < -30) s.x = w + 30;
+        if (s.x > w + 30) s.x = -30;
+        if (s.y < -30) s.y = h + 30;
+        if (s.y > h + 30) s.y = -30;
+      }
+
+      const P = stars.map(pos);
+
+      // Links between nearby mid/near stars
       const links: [number, number][] = [];
       ctx.lineWidth = 1;
-      ctx.strokeStyle = colors.line;
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
-          if (d < LINK) {
+      for (let i = 0; i < stars.length; i++) {
+        if (stars[i].layer === 0) continue;
+        for (let j = i + 1; j < stars.length; j++) {
+          if (stars[j].layer === 0) continue;
+          const reach = stars[i].hub || stars[j].hub ? LINK * 1.35 : LINK;
+          const d = Math.hypot(P[i].x - P[j].x, P[i].y - P[j].y);
+          if (d < reach) {
             links.push([i, j]);
-            ctx.globalAlpha = (1 - d / LINK) * 0.35;
+            ctx.strokeStyle = rgba(c.line, (1 - d / reach) * 0.32);
             ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.moveTo(P[i].x, P[i].y);
+            ctx.lineTo(P[j].x, P[j].y);
             ctx.stroke();
           }
         }
       }
 
       // Links to the cursor
-      ctx.strokeStyle = colors.accent;
-      for (const n of nodes) {
-        const d = Math.hypot(n.x - mouse.x, n.y - mouse.y);
+      for (let i = 0; i < stars.length; i++) {
+        if (stars[i].layer === 0) continue;
+        const d = Math.hypot(P[i].x - mouse.x, P[i].y - mouse.y);
         if (d < CURSOR_REACH) {
-          ctx.globalAlpha = (1 - d / CURSOR_REACH) * 0.5;
+          ctx.strokeStyle = rgba(c.accent, (1 - d / CURSOR_REACH) * 0.45);
           ctx.beginPath();
-          ctx.moveTo(n.x, n.y);
+          ctx.moveTo(P[i].x, P[i].y);
           ctx.lineTo(mouse.x, mouse.y);
           ctx.stroke();
         }
       }
 
-      // Nodes
-      ctx.fillStyle = colors.dot;
-      for (const n of nodes) {
-        ctx.globalAlpha = 0.55;
+      // Stars, twinkling; hubs get a slow pulsing halo
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        const tw = reduced ? 1 : 0.55 + 0.45 * Math.sin(time * s.speed + s.phase);
+        const a = LAYER[s.layer].alpha * (s.hub ? 1 : tw);
+        const col = s.tint === "accent" ? c.accent : s.tint === "ink" ? c.ink : c.dot;
+        if (s.hub) {
+          const pulse = reduced ? 0.5 : (Math.sin(time * 1.2 + s.phase) + 1) / 2;
+          ctx.strokeStyle = rgba(c.accent, 0.35 * (1 - pulse) + 0.1);
+          ctx.beginPath();
+          ctx.arc(P[i].x, P[i].y, s.r + 4 + pulse * 7, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        if (s.layer === 2 && !s.hub) {
+          // soft glow on the nearest stars
+          ctx.fillStyle = rgba(col, a * 0.12);
+          ctx.beginPath();
+          ctx.arc(P[i].x, P[i].y, s.r * 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = rgba(col, a);
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.arc(P[i].x, P[i].y, s.r, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Packets: a request hopping along a link
       if (!reduced) {
-        if (now - lastPacket > 650 && links.length && packets.length < 6) {
-          const [a, b] = links[Math.floor(Math.random() * links.length)];
-          packets.push(Math.random() < 0.5 ? { a, b, t: 0 } : { a: b, b: a, t: 0 });
+        // Packets, leaving more often from hubs
+        if (now - lastPacket > 520 && links.length) {
+          const fromHub = links.filter(([a, b]) => stars[a].hub || stars[b].hub);
+          const pool = fromHub.length && Math.random() < 0.6 ? fromHub : links;
+          const [a, b] = pool[Math.floor(Math.random() * pool.length)];
+          if (stars[b].hub) sendPacket(b, a);
+          else sendPacket(a, b);
           lastPacket = now;
         }
-        ctx.fillStyle = colors.accent;
         packets = packets.filter((p) => {
-          p.t += 0.018;
-          const A = nodes[p.a];
-          const B = nodes[p.b];
+          p.t += p.v;
+          const A = P[p.a];
+          const B = P[p.b];
           if (!A || !B || p.t >= 1) return false;
-          ctx.globalAlpha = Math.sin(p.t * Math.PI);
+          const x = A.x + (B.x - A.x) * p.t;
+          const y = A.y + (B.y - A.y) * p.t;
+          const tail = Math.max(0, p.t - 0.18);
+          const fade = Math.sin(p.t * Math.PI);
+          const g = ctx.createLinearGradient(A.x + (B.x - A.x) * tail, A.y + (B.y - A.y) * tail, x, y);
+          g.addColorStop(0, rgba(c.accent, 0));
+          g.addColorStop(1, rgba(c.accent, 0.8 * fade));
+          ctx.strokeStyle = g;
+          ctx.lineWidth = 1.6;
           ctx.beginPath();
-          ctx.arc(A.x + (B.x - A.x) * p.t, A.y + (B.y - A.y) * p.t, 2.2, 0, Math.PI * 2);
+          ctx.moveTo(A.x + (B.x - A.x) * tail, A.y + (B.y - A.y) * tail);
+          ctx.lineTo(x, y);
+          ctx.stroke();
+          ctx.lineWidth = 1;
+          ctx.fillStyle = rgba(c.accent, fade);
+          ctx.beginPath();
+          ctx.arc(x, y, 2.1, 0, Math.PI * 2);
           ctx.fill();
           return true;
         });
+
+        // Click ripples
+        ripples = ripples.filter((r) => {
+          r.t += 0.016;
+          if (r.t >= 1) return false;
+          ctx.strokeStyle = rgba(c.accent, 0.5 * (1 - r.t));
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(r.x, r.y, 12 + r.t * 160, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.lineWidth = 1;
+          return true;
+        });
+
+        // Meteors
+        if (now > nextMeteor) {
+          const fromLeft = Math.random() < 0.5;
+          meteors.push({
+            x: fromLeft ? rand(-50, w * 0.4) : rand(w * 0.6, w + 50),
+            y: rand(-40, h * 0.35),
+            vx: (fromLeft ? 1 : -1) * rand(7, 10),
+            vy: rand(2.5, 4),
+            life: 1,
+          });
+          nextMeteor = now + rand(6000, 12000);
+        }
+        meteors = meteors.filter((m) => {
+          m.x += m.vx;
+          m.y += m.vy;
+          m.life -= 0.012;
+          if (m.life <= 0 || m.x < -200 || m.x > w + 200 || m.y > h + 100) return false;
+          const len = 14;
+          const g = ctx.createLinearGradient(m.x - m.vx * len, m.y - m.vy * len, m.x, m.y);
+          g.addColorStop(0, rgba(c.ink, 0));
+          g.addColorStop(1, rgba(c.ink, 0.75 * m.life));
+          ctx.strokeStyle = g;
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(m.x - m.vx * len, m.y - m.vy * len);
+          ctx.lineTo(m.x, m.y);
+          ctx.stroke();
+          ctx.lineWidth = 1;
+          return true;
+        });
       }
-      ctx.globalAlpha = 1;
     };
 
     const loop = (now: number) => {
@@ -159,6 +306,20 @@ export default function NetworkBackground() {
     };
     const onLeave = () => {
       mouse.x = mouse.y = -9999;
+    };
+    // Clicking or tapping empty space (not a scroll gesture): a ripple, and nearby stars fire packets outward.
+    const onDown = (e: MouseEvent) => {
+      if (reduced || (e.target as Element).closest(INTERACTIVE)) return;
+      ripples.push({ x: e.clientX, y: e.clientY, t: 0 });
+      const near = stars
+        .map((s, i) => ({ i, d: Math.hypot(pos(s).x - e.clientX, pos(s).y - e.clientY), s }))
+        .filter((n) => n.s.layer > 0 && n.d < 220)
+        .sort((a, b) => a.d - b.d)
+        .slice(0, 8);
+      for (const n of near) {
+        const far = stars.findIndex((s, j) => j !== n.i && s.layer > 0 && Math.hypot(s.x - n.s.x, s.y - n.s.y) < LINK * 1.3);
+        if (far >= 0) sendPacket(n.i, far);
+      }
     };
     const onVisibility = () => {
       cancelAnimationFrame(raf);
@@ -183,6 +344,7 @@ export default function NetworkBackground() {
 
     window.addEventListener("resize", onResize);
     window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("click", onDown);
     document.addEventListener("pointerleave", onLeave);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
@@ -190,6 +352,7 @@ export default function NetworkBackground() {
       themeWatch.disconnect();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("click", onDown);
       document.removeEventListener("pointerleave", onLeave);
       document.removeEventListener("visibilitychange", onVisibility);
     };
