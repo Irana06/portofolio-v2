@@ -2,7 +2,11 @@ import { useEffect, useRef } from "react";
 
 type Layer = 0 | 1 | 2; // 0 far, 1 mid, 2 near
 type Tint = "dot" | "ink" | "accent";
+type Kind = "dot" | "server" | "db" | "code";
 type Star = {
+  kind: Kind;
+  label: string; // for "code" stars
+  flash: number; // time (ms) a packet last arrived, lights the server/db LED
   x: number;
   y: number;
   vx: number;
@@ -25,6 +29,8 @@ const LAYER = [
   { size: [0.9, 1.5], speed: 0.16, alpha: 0.65, parallax: 0.2, pull: 0.45 },
   { size: [1.4, 2.2], speed: 0.28, alpha: 0.85, parallax: 0.38, pull: 0.8 },
 ] as const;
+// Small code-ish tokens that float in the sky alongside the stars.
+const TOKENS = ["{ }", "</>", "GET", "POST", "200", "SQL", "0x1F", "1010", ">_", "=>", "::", "[ ]"];
 const INTERACTIVE = "a, button, input, textarea, select, label, summary, [role='button'], [role='dialog'], pre, code";
 
 function readColor(name: string) {
@@ -35,8 +41,10 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
 /**
  * Background sky of the page. Three depth layers of stars twinkle and drift with parallax;
+ * some mid/near stars are backend shapes (server racks, database cylinders, code tokens);
  * mid and near stars link up into a network, a few larger hubs pulse, packets with short
- * trails hop along links (the request motif), and a meteor crosses now and then. Stars near
+ * trails hop along links (the request motif) and light a server/db LED on arrival, and a
+ * meteor crosses now and then. Stars near
  * the cursor link to it and move aside; clicking empty space sends a ripple and a burst of
  * packets. A still frame under reduced motion; paused while the tab is hidden.
  */
@@ -68,7 +76,23 @@ export default function NetworkBackground() {
     const makeStar = (layer: Layer, hub = false): Star => {
       const L = LAYER[layer];
       const roll = Math.random();
+      // Far stars stay as dots; about a quarter of mid/near stars become backend shapes.
+      const shape = Math.random();
+      const kind: Kind = hub
+        ? Math.random() < 0.5
+          ? "server"
+          : "db"
+        : layer === 0 || shape > 0.27
+          ? "dot"
+          : shape < 0.08
+            ? "server"
+            : shape < 0.15
+              ? "db"
+              : "code";
       return {
+        kind,
+        label: TOKENS[Math.floor(Math.random() * TOKENS.length)],
+        flash: -1e9,
         x: Math.random() * w,
         y: Math.random() * h,
         vx: rand(-1, 1) * L.speed,
@@ -113,6 +137,54 @@ export default function NetworkBackground() {
 
     const sendPacket = (a: number, b: number) => {
       if (packets.length < 14) packets.push({ a, b, t: 0, v: rand(0.012, 0.022) });
+    };
+
+    // A rack unit: case, two dividers, and an LED per slot. The LED lights when a packet arrives.
+    const drawServer = (x: number, y: number, k: number, col: string, a: number, lit: number) => {
+      const w2 = 8 * k;
+      const h2 = 10 * k;
+      ctx.strokeStyle = rgba(col, a);
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x - w2, y - h2, w2 * 2, h2 * 2);
+      for (let r = 1; r < 3; r++) {
+        const ly = y - h2 + (h2 * 2 * r) / 3;
+        ctx.beginPath();
+        ctx.moveTo(x - w2, ly);
+        ctx.lineTo(x + w2, ly);
+        ctx.stroke();
+      }
+      for (let r = 0; r < 3; r++) {
+        const ly = y - h2 + (h2 * 2 * (r + 0.5)) / 3;
+        ctx.fillStyle = r === 0 && lit > 0 ? rgba(c.accent, Math.min(1, 0.35 + lit)) : rgba(col, a * 0.6);
+        ctx.beginPath();
+        ctx.arc(x + w2 - 3 * k, ly, 1.1 * k, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = rgba(col, a * 0.45);
+        ctx.fillRect(x - w2 + 2.5 * k, ly - 0.5, 6 * k, 1);
+      }
+    };
+
+    // A database cylinder; its top ring glows when a packet arrives.
+    const drawDb = (x: number, y: number, k: number, col: string, a: number, lit: number) => {
+      const rx = 7 * k;
+      const ry = 2.6 * k;
+      const top = y - 7 * k;
+      const bottom = y + 7 * k;
+      ctx.strokeStyle = rgba(col, a);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x - rx, top);
+      ctx.lineTo(x - rx, bottom);
+      ctx.ellipse(x, bottom, rx, ry, 0, Math.PI, 0, true);
+      ctx.lineTo(x + rx, top);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI);
+      ctx.stroke();
+      ctx.strokeStyle = lit > 0 ? rgba(c.accent, Math.min(1, 0.35 + lit)) : rgba(col, a);
+      ctx.beginPath();
+      ctx.ellipse(x, top, rx, ry, 0, 0, Math.PI * 2);
+      ctx.stroke();
     };
 
     const draw = (now: number) => {
@@ -186,39 +258,57 @@ export default function NetworkBackground() {
         }
       }
 
-      // Stars, twinkling; hubs get a slow pulsing halo
+      // Stars and backend shapes, twinkling; hubs get a slow pulsing halo
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
       for (let i = 0; i < stars.length; i++) {
         const s = stars[i];
         const tw = reduced ? 1 : 0.55 + 0.45 * Math.sin(time * s.speed + s.phase);
         const a = LAYER[s.layer].alpha * (s.hub ? 1 : tw);
         const col = s.tint === "accent" ? c.accent : s.tint === "ink" ? c.ink : c.dot;
+        const { x, y } = P[i];
+        const lit = Math.max(0, 1 - (now - s.flash) / 600); // LED glow fades over 0.6s
         if (s.hub) {
           const pulse = reduced ? 0.5 : (Math.sin(time * 1.2 + s.phase) + 1) / 2;
-          ctx.strokeStyle = rgba(c.accent, 0.35 * (1 - pulse) + 0.1);
+          ctx.strokeStyle = rgba(c.accent, 0.25 * (1 - pulse) + 0.06);
           ctx.beginPath();
-          ctx.arc(P[i].x, P[i].y, s.r + 4 + pulse * 7, 0, Math.PI * 2);
+          ctx.arc(x, y, 16 + pulse * 8, 0, Math.PI * 2);
           ctx.stroke();
         }
-        if (s.layer === 2 && !s.hub) {
-          // soft glow on the nearest stars
-          ctx.fillStyle = rgba(col, a * 0.12);
+        if (s.kind === "server") {
+          drawServer(x, y, s.hub ? 1.15 : s.layer === 2 ? 0.95 : 0.75, s.hub ? c.ink : col, s.hub ? 0.45 : a * 0.6, lit);
+        } else if (s.kind === "db") {
+          drawDb(x, y, s.hub ? 1.15 : s.layer === 2 ? 0.95 : 0.75, s.hub ? c.ink : col, s.hub ? 0.45 : a * 0.6, lit);
+        } else if (s.kind === "code") {
+          ctx.font = `${s.layer === 2 ? 11 : 9.5}px 'IBM Plex Mono', monospace`;
+          ctx.fillStyle = rgba(col, a * 0.55);
+          ctx.fillText(s.label, x, y);
+        } else {
+          if (s.layer === 2) {
+            // soft glow on the nearest stars
+            ctx.fillStyle = rgba(col, a * 0.12);
+            ctx.beginPath();
+            ctx.arc(x, y, s.r * 3.2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.fillStyle = rgba(col, a);
           ctx.beginPath();
-          ctx.arc(P[i].x, P[i].y, s.r * 3.2, 0, Math.PI * 2);
+          ctx.arc(x, y, s.r, 0, Math.PI * 2);
           ctx.fill();
         }
-        ctx.fillStyle = rgba(col, a);
-        ctx.beginPath();
-        ctx.arc(P[i].x, P[i].y, s.r, 0, Math.PI * 2);
-        ctx.fill();
       }
 
       if (!reduced) {
         // Packets, leaving more often from hubs
         if (now - lastPacket > 520 && links.length) {
-          const fromHub = links.filter(([a, b]) => stars[a].hub || stars[b].hub);
+          const fromHub = links.filter(
+            ([a, b]) => stars[a].hub || stars[b].hub || stars[a].kind === "server" || stars[b].kind === "server" || stars[a].kind === "db" || stars[b].kind === "db",
+          );
           const pool = fromHub.length && Math.random() < 0.6 ? fromHub : links;
           const [a, b] = pool[Math.floor(Math.random() * pool.length)];
-          if (stars[b].hub) sendPacket(b, a);
+          // Aim at the server/db end when there is one, so requests visibly "arrive".
+          const isBox = (k: number) => stars[k].kind === "server" || stars[k].kind === "db";
+          if (isBox(a) && !isBox(b)) sendPacket(b, a);
           else sendPacket(a, b);
           lastPacket = now;
         }
@@ -226,7 +316,11 @@ export default function NetworkBackground() {
           p.t += p.v;
           const A = P[p.a];
           const B = P[p.b];
-          if (!A || !B || p.t >= 1) return false;
+          if (!A || !B) return false;
+          if (p.t >= 1) {
+            stars[p.b].flash = now; // the receiving server/db lights up
+            return false;
+          }
           const x = A.x + (B.x - A.x) * p.t;
           const y = A.y + (B.y - A.y) * p.t;
           const tail = Math.max(0, p.t - 0.18);
