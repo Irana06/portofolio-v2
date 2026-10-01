@@ -39,7 +39,7 @@ export default function Section({
   return (
     <section id={id} aria-labelledby={`${id}-title`} className={`border-t border-rule ${spacing}`}>
       <div className="page grid gap-6 md:grid-cols-[11rem_1fr] md:gap-12 xl:grid-cols-[15rem_1fr] xl:gap-20">
-        <header ref={head} className="self-start overflow-hidden md:sticky md:top-10">
+        <header ref={head} className="self-start overflow-hidden md:sticky md:top-24">
           <p className="font-mono text-[13px] text-accent">§ {number}</p>
           <h2 id={`${id}-title`} className="mt-1 text-2xl font-medium leading-tight md:text-[1.7rem]">
             {title}

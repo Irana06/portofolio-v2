@@ -24,6 +24,7 @@ export default function Journey() {
         ease: "none",
         scrollTrigger: {
           trigger: pin.current,
+          start: "top top+=72", // below the sticky header
           pin: true,
           scrub: 0.8,
           end: () => `+=${distance()}`,
@@ -40,7 +41,7 @@ export default function Journey() {
 
   return (
     <section id="journey" aria-labelledby="journey-title" className="border-t border-rule">
-      <div ref={pin} className="overflow-hidden py-16 md:py-24 lg:flex lg:min-h-screen lg:flex-col lg:justify-center lg:py-14">
+      <div ref={pin} className="overflow-hidden py-16 md:py-24 lg:flex lg:min-h-[calc(100vh-72px)] lg:flex-col lg:justify-center lg:py-10">
         <div className="page grid gap-6 md:grid-cols-[11rem_1fr] md:gap-12 xl:grid-cols-[15rem_1fr] xl:gap-20">
           <header>
             <p className="font-mono text-[13px] text-accent">§ 2</p>

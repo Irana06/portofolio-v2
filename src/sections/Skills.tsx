@@ -69,7 +69,7 @@ export default function Skills() {
           )}
         </div>
 
-        <div ref={panel} aria-live="polite" className="self-start rounded-md border border-rule bg-raised p-5 lg:sticky lg:top-8">
+        <div ref={panel} aria-live="polite" className="self-start rounded-md border border-rule bg-raised p-5 lg:sticky lg:top-24">
           <p className="font-mono text-[12px] text-muted">where it's used</p>
           <p className="mt-1 font-mono text-lg text-accent">{selected}</p>
 

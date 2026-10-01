@@ -4,6 +4,8 @@ import Intro from "./sections/Intro";
 import Projects from "./sections/Projects";
 import Journey from "./sections/Journey";
 import ScrollProgress from "./components/ScrollProgress";
+import NetworkBackground from "./components/NetworkBackground";
+import Cursor from "./components/Cursor";
 import Experience from "./sections/Experience";
 import Skills from "./sections/Skills";
 import Certificates from "./sections/Certificates";
@@ -18,9 +20,11 @@ export default function App() {
       >
         Skip to content
       </a>
+      <NetworkBackground />
+      <Cursor />
       <ScrollProgress />
       <Header />
-      <main>
+      <main className="relative z-[1]">
         <Intro />
         <Projects />
         <Journey />
@@ -29,7 +33,9 @@ export default function App() {
         <Certificates />
         <Contact />
       </main>
-      <Footer />
+      <div className="relative z-[1]">
+        <Footer />
+      </div>
     </>
   );
 }

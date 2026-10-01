@@ -51,6 +51,23 @@
     @apply underline decoration-rule decoration-1 underline-offset-[3px] transition-colors hover:decoration-accent;
   }
 
+  /* Custom cursor (mouse only): hide the system pointer, but keep the I-beam in text fields. */
+  html.custom-cursor,
+  html.custom-cursor * {
+    cursor: none !important;
+  }
+  html.custom-cursor :is(input, textarea, [contenteditable="true"]) {
+    cursor: text !important;
+  }
+  /* Modal dialogs sit above everything, so fall back to the system pointer while one is open. */
+  html.custom-cursor:has(dialog[open]),
+  html.custom-cursor:has(dialog[open]) * {
+    cursor: auto !important;
+  }
+  html:has(dialog[open]) .cursor-el {
+    display: none;
+  }
+
   ::selection {
     background: rgb(var(--accent) / 0.2);
   }

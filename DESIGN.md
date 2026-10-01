@@ -13,6 +13,8 @@ Chosen by the owner (Yusuf). Future UI work on this repo follows this file, and 
 | Pattern | Rule | Decision |
 | --- | --- | --- |
 | Terminal window in the hero | R-05 (fake terminal as hero visual) | **Kept by the owner** (2026-09-30). Built as a working terminal: every command answers from `src/data/portfolio.ts`, nothing auto-types, no invented output such as latency or status codes. |
+| Particle background | R-07 (background pattern), R-19 (endless motion) | **Requested by the owner** (2026-10-01). Drawn as a network of nodes with packets hopping along links, the same request motif as the diagrams, and it reacts to the cursor. Low opacity behind text, paused when the tab is hidden, a still frame under reduced motion. |
+| Custom cursor | Not a named pattern; noted because it replaces a system control | **Requested by the owner** (2026-10-01). Mouse only; the system I-beam returns in text fields and the system pointer returns while a dialog is open. |
 
 ## Decisions and why
 
@@ -32,6 +34,8 @@ Chosen by the owner (Yusuf). Future UI work on this repo follows this file, and 
 | Name rises letter by letter on load; section titles slide in once | Sets the pace at the top of each part of the page, runs once |
 | Reading progress bar | Shows how much of the page is left |
 | Screenshot parallax, certificate preview following the cursor (desktop) | Depth and a quick look without opening the dialog |
+| Sticky header with active-section highlight | Navigation stays one click away on a long page, and shows where the reader is |
+| Mobile menu as a side drawer | Owner request; numbered like the sections, closes on link tap, Escape, or backdrop tap, and locks page scroll while open |
 | All motion off under `prefers-reduced-motion` | Diagrams and timeline render complete and static |
 | No icon library | Every control has a text label |
 
