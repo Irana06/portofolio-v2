@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
-import { contactLinks, experience, profile, projects, skills } from "../data/portfolio";
+import { contactLinks, deployment, experience, profile, projects, skills } from "../data/portfolio";
 import { formatYm } from "../lib/format";
 
 type Line = { id: number; kind: "in" | "out" | "err"; body: ReactNode };
@@ -73,6 +73,19 @@ const COMMANDS: Record<string, { about: string; run: () => ReactNode }> = {
       </table>
     ),
   },
+  deploy: {
+    about: "how I ship",
+    run: () => (
+      <>
+        <div>
+          {deployment.title} <span className="text-term-muted">({deployment.status})</span>
+        </div>
+        <div className="text-term-muted">
+          {deployment.diagram.nodes.map((n) => n.label).join(" -> ")}
+        </div>
+      </>
+    ),
+  },
   experience: {
     about: "where I've worked",
     run: () => (
@@ -119,7 +132,7 @@ const COMMANDS: Record<string, { about: string; run: () => ReactNode }> = {
   },
 };
 
-const SUGGESTED = ["help", "whoami", "projects", "stack", "contact"];
+const SUGGESTED = ["help", "whoami", "projects", "stack", "deploy", "contact"];
 
 let nextId = 0;
 

@@ -33,7 +33,7 @@ export interface Experience {
   role: string;
   company: string;
   companyUrl?: string;
-  location: string;
+  location?: string;
   type: string;
   /** "YYYY-MM" */
   start: string;
@@ -62,4 +62,12 @@ export interface ContactLink {
   label: string;
   handle: string;
   href: string;
+}
+
+/** How you deploy, shown under Skills as a diagram */
+export interface Deployment {
+  title: string;
+  status: string;
+  summary: string;
+  diagram: Diagram;
 }

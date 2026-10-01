@@ -81,11 +81,13 @@ export default function CV() {
                     {formatYm(e.start)} to {formatYm(e.end)}
                   </p>
                 </div>
-                <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-[14.5px] leading-relaxed">
-                  {e.points.map((p) => (
-                    <li key={p}>{p}</li>
-                  ))}
-                </ul>
+                {e.points.length > 0 && (
+                  <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-[14.5px] leading-relaxed">
+                    {e.points.map((p) => (
+                      <li key={p}>{p}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>

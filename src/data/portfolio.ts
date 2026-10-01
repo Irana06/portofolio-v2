@@ -5,7 +5,7 @@
  * Search for "TODO" to find the parts that still need your input.
  * Write only things that are true: a missing section is better than a made-up one.
  */
-import type { Certificate, ContactLink, Education, Experience, Project, SkillGroup } from "./types";
+import type { Certificate, ContactLink, Deployment, Education, Experience, Project, SkillGroup } from "./types";
 
 import portrait from "../assets/images/avatar.png";
 import photoCv from "../assets/images/photo-cv.jpg";
@@ -36,16 +36,16 @@ export const profile = {
   cvFile,
   /** Shown under the intro. Set to "" to hide it. */
   availability: "Open to backend roles, full-time or contract.",
-  // TODO: rewrite these in your own words once you've added your latest job.
+  // TODO: rewrite these in your own words when you have a moment.
   intro:
     "I build web applications with Laravel and PostgreSQL. I started out as a full-stack developer shipping Laravel and React apps end to end, and the part I keep coming back to is the backend: how the data is modelled, how the queries run, and what the API hands to the frontend.",
   about: [
-    "My first professional work was a six-month programmer internship at PT Javan Cipta Solusi in Sleman, where I worked on internal and client applications with Laravel, React, and PostgreSQL alongside senior developers.",
+    "Since February 2026 I've worked in Project Development at CV Genta Sandi Mandiri, first as a trainee and from April as an internal employee.",
+    "Before that I did a six-month programmer internship at PT Javan Cipta Solusi in Sleman, working on internal and client applications with Laravel, React, and PostgreSQL alongside senior developers.",
     "I'm currently studying Information Systems at Universitas Terbuka.",
   ],
   /** Things you're learning right now. Leave empty to hide the line. */
-  // TODO: add what you've been learning this year, e.g. "queues and background jobs in Laravel".
-  learning: [] as string[],
+  learning: ["self-hosting on a home server behind Cloudflare Tunnel"] as string[],
 };
 
 export const contactLinks: ContactLink[] = [
@@ -60,9 +60,10 @@ export const contactFormEndpoint = "https://formspree.io/f/mpwyzgrn";
 
 export const skills: SkillGroup[] = [
   { label: "Languages", items: ["PHP", "SQL", "TypeScript", "JavaScript"] },
-  { label: "Backend", items: ["Laravel", "REST APIs", "Authentication and role-based access", "Livewire"] },
+  { label: "Backend", items: ["Laravel", "REST APIs", "Authentication and role-based access", "Livewire", "Backend problem solving"] },
   { label: "Data", items: ["PostgreSQL", "Query optimisation", "DBeaver"] },
-  { label: "Tooling", items: ["Git, GitHub, GitLab", "Docker", "Postman", "Ubuntu", "FileZilla"] },
+  { label: "Deployment", items: ["Railway", "Cloudflare Tunnel (setting up)", "Docker", "Ubuntu", "FileZilla"] },
+  { label: "Tooling", items: ["Git, GitHub, GitLab", "Claude Code", "Postman"] },
   { label: "Frontend, when needed", items: ["React", "Inertia.js", "Tailwind CSS"] },
   // TODO: add the tools you picked up this year.
 ];
@@ -129,18 +130,28 @@ export const projects: Project[] = [
 ];
 
 export const experience: Experience[] = [
-  // TODO: add your current job here (newest first). Example shape:
-  // {
-  //   role: "Backend Developer",
-  //   company: "Company name",
-  //   companyUrl: "https://...",
-  //   location: "Yogyakarta",
-  //   type: "Full-time",
-  //   start: "2025-02",
-  //   end: null,
-  //   points: ["What you built or own", "A result you can back up"],
-  //   stack: ["Laravel", "PostgreSQL"],
-  // },
+  {
+    role: "Project Development",
+    company: "CV Genta Sandi Mandiri",
+    // TODO: add location: "...", and companyUrl if the company has a website
+    type: "Internal employee",
+    start: "2026-04",
+    end: "2026-10",
+    // TODO: 2 to 4 things you built or own here. Empty lists are hidden on the site.
+    points: [],
+    // TODO: the stack you use here, e.g. ["Laravel", "PostgreSQL"]
+    stack: [],
+  },
+  {
+    role: "Project Development (training)",
+    company: "CV Genta Sandi Mandiri",
+    type: "Training",
+    start: "2026-02",
+    end: "2026-04",
+    // TODO: what you learned or worked on during training
+    points: [],
+    stack: [],
+  },
   {
     role: "PHP & React Programmer Intern",
     company: "PT Javan Cipta Solusi",
@@ -158,6 +169,30 @@ export const experience: Experience[] = [
     stack: ["Laravel", "PostgreSQL", "React", "TypeScript", "GitLab"],
   },
 ];
+
+/**
+ * How you ship. Projects currently go out on Railway; the home server route
+ * below is being set up. Update the status when it goes live.
+ */
+export const deployment: Deployment = {
+  title: "Home server behind Cloudflare Tunnel",
+  status: "setting up",
+  summary:
+    "My latest project runs on Railway. I'm moving my own deployments to a home server exposed through Cloudflare Tunnel, so the server needs no open ports or public IP.",
+  diagram: {
+    nodes: [
+      { id: "visitor", label: "Visitor", note: "browser", col: 0, row: 0 },
+      { id: "edge", label: "Cloudflare", note: "DNS + TLS at the edge", col: 0, row: 1 },
+      { id: "tunnel", label: "cloudflared", note: "outbound tunnel on the home server", col: 0, row: 2 },
+      { id: "app", label: "App", note: "served on localhost", col: 0, row: 3 },
+    ],
+    edges: [
+      { from: "visitor", to: "edge", label: "HTTPS" },
+      { from: "edge", to: "tunnel", label: "tunnel" },
+      { from: "tunnel", to: "app", label: "localhost" },
+    ],
+  },
+};
 
 export const education: Education[] = [
   { degree: "Bachelor of Information Systems (in progress)", school: "Universitas Terbuka", period: "2025 to present" },

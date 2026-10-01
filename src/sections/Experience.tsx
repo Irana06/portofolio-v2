@@ -42,19 +42,23 @@ export default function Experience() {
                 e.company
               )}
             </h3>
-            <p className="font-sans text-sm text-muted">{e.location}</p>
-            <ul className="mt-4 list-disc space-y-1.5 pl-5 marker:text-muted">
-              {e.points.map((pt) => (
-                <li key={pt}>{pt}</li>
-              ))}
-            </ul>
-            <p className="mt-4 flex flex-wrap gap-2">
-              {e.stack.map((s) => (
-                <span key={s} className="rounded-sm border border-rule px-2 py-0.5 font-mono text-[12px] text-muted">
-                  {s}
-                </span>
-              ))}
-            </p>
+            {e.location && <p className="font-sans text-sm text-muted">{e.location}</p>}
+            {e.points.length > 0 && (
+              <ul className="mt-4 list-disc space-y-1.5 pl-5 marker:text-muted">
+                {e.points.map((pt) => (
+                  <li key={pt}>{pt}</li>
+                ))}
+              </ul>
+            )}
+            {e.stack.length > 0 && (
+              <p className="mt-4 flex flex-wrap gap-2">
+                {e.stack.map((s) => (
+                  <span key={s} className="rounded-sm border border-rule px-2 py-0.5 font-mono text-[12px] text-muted">
+                    {s}
+                  </span>
+                ))}
+              </p>
+            )}
           </li>
         ))}
       </ol>
