@@ -28,7 +28,7 @@ Chosen by the owner (Yusuf). Future UI work on this repo follows this file, and 
 | Terminal keeps a dark surface in both themes | It is the one focal point of the hero |
 | Architecture diagram per project, drawn on scroll with a travelling request dot | Motion with a purpose: it shows the order data moves through the system. Scrubbed to scroll, never looping |
 | Experience timeline line fills on scroll | Shows the reader where they are in the timeline |
-| "Inside a request" pinned section (desktop) | Scrolling moves one booking request sideways through each layer of the stack, with a rail showing the current layer. It shows backend thinking instead of claiming it. Plain list on phones and with reduced motion |
+| "Inside a request" pinned section (desktop) | Scrolling moves one tournament registration (modelled on Badmintoon Portal) sideways through each layer of the stack, with a rail showing the current layer. It shows backend thinking instead of claiming it. Plain list on phones and with reduced motion |
 | Diagram nodes highlight their connections on hover/tap; "replay request" button | Lets the visitor trace the flow themselves instead of only watching it |
 | Skill explorer | Each skill shows the real projects and jobs that use it, computed from the data; an honest empty state when none do |
 | Name rises letter by letter on load; section titles slide in once | Sets the pace at the top of each part of the page, runs once |
@@ -44,3 +44,5 @@ Chosen by the owner (Yusuf). Future UI work on this repo follows this file, and 
 - Only real content. No invented numbers, testimonials, or job details. A section with no real data is hidden, not filled.
 - Diagrams show only components the project really uses.
 - No em dashes in copy.
+
+- Keep it short (owner, 2026-10-08: the site is sent with job applications, so HR should not have to wade through it). Match the CV PDF; at most 4 points per job and 3 per project.

@@ -51,10 +51,9 @@ export default function Journey() {
           </header>
           <div>
             <p className="prose-measure text-lg">
-              What happens between a visitor pressing "Book table" and the confirmation landing in their inbox, layer by
-              layer, the way I build it in Laravel.
+              One tournament registration, from the form to the database and back, the way I build it in Laravel.
             </p>
-            <p className="mt-2 font-mono text-[12px] text-muted">illustrative code, not taken from a client project</p>
+            <p className="mt-2 font-mono text-[12px] text-muted">illustrative code, modelled on Badmintoon Portal</p>
 
             {/* Rail: which layer the request is in. Only meaningful while the section is pinned. */}
             <div className="relative mt-8 hidden lg:block" aria-hidden>

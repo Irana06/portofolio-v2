@@ -47,7 +47,7 @@ export default function CV() {
           <div>
             <h1 className="text-3xl font-medium">{profile.fullName}</h1>
             <p className="mt-1 text-lg text-neutral-700">
-              {profile.role}, {profile.location}
+              {profile.role} · {profile.location}
             </p>
             <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-sans text-[13px] text-neutral-700">
               <li>{profile.email}</li>

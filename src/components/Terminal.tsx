@@ -31,7 +31,9 @@ const COMMANDS: Record<string, { about: string; run: () => ReactNode }> = {
     run: () => (
       <>
         <div>
-          {profile.name}, {profile.role.toLowerCase()} in {profile.location}
+          {profile.name}, {profile.role.toLowerCase()}
+        </div>
+        <div className="text-term-muted">{profile.location}
         </div>
         {profile.availability && <div className="text-term-muted">{profile.availability}</div>}
       </>
