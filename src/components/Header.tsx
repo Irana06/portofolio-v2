@@ -4,7 +4,6 @@ import { gsap } from "../lib/gsap";
 
 const LINKS = [
   { href: "#projects", label: "Projects" },
-  { href: "#journey", label: "Request flow" },
   { href: "#experience", label: "Experience" },
   { href: "#skills", label: "Skills" },
   { href: "#certificates", label: "Certificates" },

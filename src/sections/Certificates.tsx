@@ -40,7 +40,7 @@ export default function Certificates() {
   };
 
   return (
-    <Section id="certificates" number={5} title="Certificates">
+    <Section id="certificates" number={4} title="Certificates">
       <ul onMouseMove={onMove} onMouseLeave={() => setHovered(null)} className="divide-y divide-rule border-y border-rule">
         {certificates.map((c) => (
           <li

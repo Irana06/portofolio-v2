@@ -100,7 +100,10 @@ export default function CV() {
             {projects.map((p) => (
               <div key={p.slug} className="break-inside-avoid">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-                  <p className="font-medium">{p.name}</p>
+                  <p>
+                    <span className="font-medium">{p.name}</span>
+                    {p.context && <span className="text-[13px] text-neutral-600"> ({p.context})</span>}
+                  </p>
                   <p className="font-sans text-xs text-neutral-600">{p.stack.join(", ")}</p>
                 </div>
                 <p className="mt-1 text-[14.5px]">{p.summary}</p>

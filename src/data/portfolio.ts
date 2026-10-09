@@ -5,9 +5,9 @@
  * Search for "TODO" to find the parts that still need your input.
  * Write only things that are true: a missing section is better than a made-up one.
  */
-import type { Certificate, ContactLink, Deployment, Education, Experience, Project, SkillGroup } from "./types";
+import type { Certificate, ClientSite, ContactLink, Deployment, Education, Experience, Project, SkillGroup } from "./types";
 
-import portrait from "../assets/images/avatar.png";
+import portrait from "../assets/images/avatar.webp";
 import photoCv from "../assets/images/photo-cv.jpg";
 import cvFile from "../assets/files/cv-yusuf-novandra.pdf";
 
@@ -41,11 +41,11 @@ export const profile = {
     "8 months at CV Genta Sandi Mandiri (GSM Studio) building client websites and Laravel apps, and cleaning up hacked sites. Before that, a 6-month PHP internship at PT Javan Cipta Solusi.",
   ],
   /** Things you're learning right now. Leave empty to hide the line. */
-  learning: ["Go"] as string[],
+  learning: ["Go", "Flutter", "Unity"] as string[],
 };
 
 export const contactLinks: ContactLink[] = [
-  { label: "GitHub", handle: "Yusufnova06", href: "https://github.com/Yusufnova06" },
+  { label: "GitHub", handle: "Irana06", href: "https://github.com/Irana06" },
   { label: "LinkedIn", handle: "yusuf-novandra", href: "https://www.linkedin.com/in/yusuf-novandra-74705731a" },
   { label: "Telegram", handle: "@Yusufnovaa", href: "https://t.me/Yusufnovaa" },
   { label: "WhatsApp", handle: "+62 857-2584-1667", href: "https://wa.me/6285725841667" },
@@ -55,15 +55,123 @@ export const contactLinks: ContactLink[] = [
 export const contactFormEndpoint = "https://formspree.io/f/mpwyzgrn";
 
 export const skills: SkillGroup[] = [
-  { label: "Backend", items: ["PHP", "Laravel", "RESTful API"] },
+  { label: "Backend", items: ["PHP", "Laravel", "Livewire", "RESTful API", "Payment gateway (Midtrans)"] },
   { label: "Data", items: ["PostgreSQL", "MySQL"] },
-  { label: "Servers and security", items: ["Website security", "Server & VPS troubleshooting", "Railway", "Cloudflare Tunnel"] },
+  { label: "Servers and security", items: ["Website security", "Server & VPS troubleshooting", "Cloudflare Tunnel"] },
   { label: "WordPress", items: ["WordPress", "Elementor", "ACF", "Polylang"] },
   { label: "Frontend", items: ["React (Inertia.js)", "JavaScript"] },
-  { label: "Tools", items: ["Git", "Claude Code"] },
+  { label: "Tools", items: ["Git", "Railway", "Claude Code"] },
 ];
 
 export const projects: Project[] = [
+  {
+    slug: "ruangkelas-lms",
+    name: "RuangKelas (school LMS)",
+    year: "2026",
+    status: "in-review",
+    context: "company project, Script Media",
+    summary:
+      "LMS template for schools: one install per school, with admin, teacher, student, and parent roles.",
+    work: [
+      "Two-layer authorization: role middleware on routes, plus data scoped per teacher, homeroom class, and approved parent",
+      "Weighted final grades with an audit trail, and quizzes shuffled per student with automatic scoring",
+      "Account import from Dapodik/EMIS Excel files and ZIP backup/restore, deployed on cPanel",
+    ],
+    stack: ["Laravel", "PHP", "Livewire", "MySQL", "Pest"],
+    diagram: {
+      lanes: ["Laravel app", "MySQL"],
+      steps: [
+        { id: "start", kind: "start", label: "User logs in", lane: 0, row: 0 },
+        { id: "role", kind: "task", label: "Check role, scope data to the user", lane: 0, row: 1 },
+        { id: "grade", kind: "task", label: "Teacher enters grades and quizzes", lane: 0, row: 2 },
+        { id: "db", kind: "data", label: "grades, quizzes, audit log", lane: 1, row: 2 },
+        { id: "pdf", kind: "task", label: "Generate PDF report card", lane: 0, row: 3 },
+        { id: "end", kind: "end", label: "Report card ready", lane: 0, row: 4 },
+      ],
+      flows: [
+        { from: "start", to: "role" },
+        { from: "role", to: "grade" },
+        { from: "grade", to: "db", kind: "data", label: "save" },
+        { from: "grade", to: "pdf" },
+        { from: "db", to: "pdf", kind: "data", label: "read" },
+        { from: "pdf", to: "end" },
+      ],
+    },
+    links: [],
+  },
+  {
+    slug: "sewa-toko-online",
+    name: "Sewa Toko Online",
+    year: "2026",
+    status: "in-review",
+    context: "company project, Script Media",
+    summary:
+      "E-commerce rental platform: a storefront app for shoppers and an internal panel for plans, subscriptions, and invoices.",
+    work: [
+      "Two Laravel apps: toko-engine (catalog, cart, guest checkout, orders) and toko-panel (plans, tenants, recurring invoices)",
+      "Midtrans payments (sandbox) and per-plan limits on products and payment channels",
+      "Per-tenant database provisioning with stancl/tenancy",
+    ],
+    stack: ["Laravel", "PHP", "Livewire", "Midtrans", "stancl/tenancy"],
+    diagram: {
+      lanes: ["toko-engine", "Panel DB", "Midtrans"],
+      steps: [
+        { id: "start", kind: "start", label: "Shopper checks out", lane: 0, row: 0 },
+        { id: "order", kind: "task", label: "Create order", lane: 0, row: 1 },
+        { id: "limits", kind: "data", label: "plan limits", lane: 1, row: 1 },
+        { id: "pay", kind: "task", label: "Send to payment", lane: 0, row: 2 },
+        { id: "midtrans", kind: "task", label: "Shopper pays", lane: 2, row: 2 },
+        { id: "paid", kind: "task", label: "Update order status", lane: 0, row: 3 },
+        { id: "end", kind: "end", label: "Order paid", lane: 0, row: 4 },
+      ],
+      flows: [
+        { from: "start", to: "order" },
+        { from: "limits", to: "order", kind: "data", label: "check" },
+        { from: "order", to: "pay" },
+        { from: "pay", to: "midtrans", kind: "message", label: "pay" },
+        { from: "midtrans", to: "paid", kind: "message", label: "status" },
+        { from: "paid", to: "end" },
+      ],
+    },
+    links: [],
+  },
+  {
+    slug: "monshika",
+    name: "Monshika",
+    year: "2026",
+    status: "finished",
+    context: "own product, Shicomp (my business)",
+    summary: "Personal finance app (Flutter). Data stays on the phone, with an optional encrypted backup.",
+    work: [
+      "Local-first data in SQLite (Drift): works offline, with CSV/Excel/PDF export and CSV import",
+      "Optional backup to the user's own Google Drive app folder, encrypted with AES-256-GCM, scheduled in the background",
+      "Live exchange rates for 200+ currencies, gold, and crypto; 8 Android home-screen widgets",
+    ],
+    stack: ["Flutter", "Riverpod", "SQLite (Drift)", "Google Drive API"],
+    diagram: {
+      lanes: ["Flutter app", "On device", "Cloud"],
+      steps: [
+        { id: "start", kind: "start", label: "User adds a transaction", lane: 0, row: 0 },
+        { id: "save", kind: "task", label: "Save, works offline", lane: 0, row: 1 },
+        { id: "db", kind: "data", label: "SQLite (Drift)", lane: 1, row: 1 },
+        { id: "backup", kind: "decision", label: "Backup on?", lane: 0, row: 2 },
+        { id: "local", kind: "end", label: "Stays on phone", lane: 1, row: 2 },
+        { id: "encrypt", kind: "task", label: "Encrypt (AES-256)", lane: 0, row: 3 },
+        { id: "drive", kind: "data", label: "Google Drive", lane: 2, row: 3 },
+        { id: "end", kind: "end", label: "Backed up", lane: 0, row: 4 },
+      ],
+      flows: [
+        { from: "start", to: "save" },
+        { from: "save", to: "db", kind: "data", label: "write" },
+        { from: "save", to: "backup" },
+        { from: "backup", to: "local", label: "no" },
+        { from: "backup", to: "encrypt", label: "yes" },
+        { from: "encrypt", to: "drive", kind: "message", label: "upload" },
+        { from: "encrypt", to: "end" },
+      ],
+    },
+    links: [{ label: "Source", href: "https://github.com/Irana06/monshika" }],
+  },
   {
     slug: "badmintoon-portal",
     name: "Badmintoon Portal",
@@ -78,19 +186,39 @@ export const projects: Project[] = [
     stack: ["Laravel", "PostgreSQL", "React (Inertia.js)"],
     image: badmintoonImg,
     diagram: {
-      nodes: [
-        { id: "client", label: "Browser", note: "React via Inertia", col: 0, row: 0 },
-        { id: "app", label: "Laravel", note: "auth + RBAC, CRUD", col: 0, row: 1 },
-        { id: "db", label: "PostgreSQL", note: "participants, categories, transactions", col: 0, row: 2 },
+      lanes: ["Laravel", "PostgreSQL", "React"],
+      steps: [
+        { id: "start", kind: "start", label: "Participant signs up", lane: 0, row: 0 },
+        { id: "auth", kind: "task", label: "Log in, role check", lane: 0, row: 1 },
+        { id: "register", kind: "task", label: "Register for a category", lane: 0, row: 2 },
+        { id: "db", kind: "data", label: "participants", lane: 1, row: 2 },
+        { id: "page", kind: "task", label: "Show the schedule", lane: 2, row: 3 },
+        { id: "end", kind: "end", label: "Schedule on screen", lane: 2, row: 4 },
       ],
-      edges: [
-        { from: "client", to: "app", label: "HTTP" },
-        { from: "app", to: "db", label: "SQL" },
+      flows: [
+        { from: "start", to: "auth" },
+        { from: "auth", to: "register" },
+        { from: "register", to: "db", kind: "data", label: "save" },
+        { from: "register", to: "page", label: "Inertia" },
+        { from: "page", to: "end" },
       ],
     },
     links: [],
   },
-  // TODO: GSM / Script Media projects go here once you pick which ones to show.
+];
+
+/**
+ * Websites from GSM Studio / Script Media, listed one line each under Projects.
+ * Link only sites that are live on their own domain (not previews or staging).
+ */
+export const clientSites: ClientSite[] = [
+  { name: "AMAN (Aliansi Masyarakat Adat Nusantara)", note: "client, organisation profile website" },
+  { name: "AJMAN (Asosiasi Jurnalis Masyarakat Adat Nusantara)", note: "client, organisation website" },
+  { name: "GPI (Garasi Performance Institute)", note: "client, institute website" },
+  { name: "Yudi Ahmad Tajudin", note: "client, personal profile website" },
+  { name: "Atmakanta", note: "client, rebuild of the site on a new model" },
+  { name: "Pondok Panggung", note: "client, maintenance and continued development", href: "https://pondokpanggung.com" },
+  { name: "Script Media", note: "company's own website, contributed", href: "https://script-media.net" },
 ];
 
 export const experience: Experience[] = [
@@ -104,12 +232,12 @@ export const experience: Experience[] = [
     note: "Also worked on Script Media projects.",
     links: [{ label: "script-media.net", href: "https://script-media.net" }],
     points: [
-      "Built client websites (media, organisations, culture, tourism) with WordPress and Elementor, from design to launch",
+      "Built e-commerce and school LMS products in Laravel for Script Media",
       "Extended Laravel apps, including a WordPress-to-billing integration and backend changes to a store app",
-      "Handled security incidents: removed malware and backdoors, closed the holes, restored hacked sites",
-      "Troubleshot VPS, FTP, and database issues, and rebuilt hard-to-maintain sites with Custom Post Types and ACF",
+      "Handled security incidents: removed malware and backdoors, closed the holes, restored hacked sites; troubleshot VPS, FTP, and database issues",
+      "Built client websites (media, organisations, culture, tourism) with WordPress and Elementor, from design to launch",
     ],
-    stack: ["Laravel", "PHP", "WordPress", "MySQL"],
+    stack: ["Laravel", "PHP", "Livewire", "WordPress", "MySQL"],
   },
   {
     role: "WordPress Developer (training)",
@@ -138,26 +266,25 @@ export const experience: Experience[] = [
   },
 ];
 
-/**
- * How you ship. Projects currently go out on Railway; the home server route
- * below is being set up. Update the status when it goes live.
- */
 export const deployment: Deployment = {
   title: "Home server behind Cloudflare Tunnel",
-  status: "setting up",
+  status: "live",
   summary:
-    "My latest project runs on Railway. I'm moving my own deployments to a home server behind Cloudflare Tunnel: no open ports, no public IP.",
+    "My own projects run on a home server behind Cloudflare Tunnel: no open ports, no public IP.",
   diagram: {
-    nodes: [
-      { id: "visitor", label: "Visitor", note: "browser", col: 0, row: 0 },
-      { id: "edge", label: "Cloudflare", note: "DNS + TLS at the edge", col: 0, row: 1 },
-      { id: "tunnel", label: "cloudflared", note: "outbound tunnel on the home server", col: 0, row: 2 },
-      { id: "app", label: "App", note: "served on localhost", col: 0, row: 3 },
+    lanes: ["Home server", "Cloudflare", "Visitor"],
+    steps: [
+      { id: "start", kind: "start", label: "Deploy a project", lane: 0, row: 0 },
+      { id: "app", kind: "task", label: "App runs on localhost", lane: 0, row: 1 },
+      { id: "tunnel", kind: "task", label: "cloudflared, no open ports", lane: 0, row: 2 },
+      { id: "edge", kind: "task", label: "DNS + TLS", lane: 1, row: 2 },
+      { id: "end", kind: "end", label: "Site over HTTPS", lane: 2, row: 3 },
     ],
-    edges: [
-      { from: "visitor", to: "edge", label: "HTTPS" },
-      { from: "edge", to: "tunnel", label: "tunnel" },
-      { from: "tunnel", to: "app", label: "localhost" },
+    flows: [
+      { from: "start", to: "app" },
+      { from: "app", to: "tunnel" },
+      { from: "tunnel", to: "edge", kind: "message", label: "tunnel" },
+      { from: "edge", to: "end", label: "HTTPS" },
     ],
   },
 };

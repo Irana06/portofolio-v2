@@ -1,9 +1,9 @@
-import { projects } from "../data/portfolio";
+import { clientSites, projects } from "../data/portfolio";
 import ArchDiagram from "../components/ArchDiagram";
 import ParallaxImage from "../components/ParallaxImage";
 import Section from "../components/Section";
 
-const STATUS_LABEL = { "in-progress": "in progress", finished: "finished" } as const;
+const STATUS_LABEL = { "in-progress": "in progress", "in-review": "in review", finished: "finished" } as const;
 
 export default function Projects() {
   if (projects.length === 0) return null;
@@ -16,6 +16,7 @@ export default function Projects() {
             <div>
               <p className="font-mono text-[13px] text-muted">
                 {p.year} · {STATUS_LABEL[p.status]}
+                {p.context && <> · {p.context}</>}
               </p>
               <h3 className="mt-1 text-[1.7rem] font-medium leading-snug">{p.name}</h3>
               <p className="prose-measure mt-4">{p.summary}</p>
@@ -50,7 +51,7 @@ export default function Projects() {
               {p.diagram && (
                 <figure>
                   <ArchDiagram diagram={p.diagram} name={p.name} />
-                  <figcaption className="mt-2 font-mono text-[12px] text-muted">how a request moves through it</figcaption>
+                  <figcaption className="mt-2 font-mono text-[12px] text-muted">how it's wired</figcaption>
                 </figure>
               )}
               {p.image && (
@@ -63,6 +64,27 @@ export default function Projects() {
           </article>
         ))}
       </div>
+
+      {clientSites.length > 0 && (
+        <div className="mt-16 border-t border-rule pt-10">
+          <h3 className="text-xl font-medium">Websites</h3>
+          <p className="mt-1 font-mono text-[12px] text-muted">client and company sites at GSM Studio and Script Media, built or maintained with WordPress</p>
+          <ul className="mt-5 grid gap-x-12 sm:grid-cols-2">
+            {clientSites.map((c) => (
+              <li key={c.name} className="flex flex-col justify-center border-b border-rule py-3">
+                {c.href ? (
+                  <a href={c.href} target="_blank" rel="noopener noreferrer" className="w-fit">
+                    {c.name}
+                  </a>
+                ) : (
+                  <span>{c.name}</span>
+                )}
+                <span className="font-sans text-sm text-muted">{c.note}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </Section>
   );
 }

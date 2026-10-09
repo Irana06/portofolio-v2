@@ -9,8 +9,10 @@ const norm = (s: string) => s.toLowerCase().replace(/\.js$/, "").trim();
 
 /** Where a skill shows up in the real data: project stacks and job stacks. */
 function usage(skill: string) {
-  const key = norm(skill);
-  const uses = (stack: string[]) => stack.some((s) => norm(s) === key);
+  // "Payment gateway (Midtrans)" should also match a stack entry that just says "Midtrans".
+  const alias = skill.match(/\(([^)]+)\)$/)?.[1];
+  const keys = [norm(skill), ...(alias ? [norm(alias)] : [])];
+  const uses = (stack: string[]) => stack.some((s) => keys.includes(norm(s)));
   return {
     projects: projects.filter((p) => uses(p.stack)),
     jobs: experience.filter((e) => uses(e.stack)),
@@ -36,7 +38,7 @@ export default function Skills() {
   }, [selected]);
 
   return (
-    <Section id="skills" number={4} title="Skills and deployment" spacing="py-16 md:py-24">
+    <Section id="skills" number={3} title="Skills and deployment" spacing="py-16 md:py-24">
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_26rem] xl:gap-20">
         <div>
           <p className="prose-measure text-muted">Pick a skill to see where I've used it.</p>

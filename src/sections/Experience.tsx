@@ -23,7 +23,7 @@ export default function Experience() {
   }, []);
 
   return (
-    <Section id="experience" number={3} title="Experience">
+    <Section id="experience" number={2} title="Experience">
       <ol ref={list} className="relative space-y-12 border-l border-rule pl-7">
         <span data-progress aria-hidden className="absolute -left-px top-0 h-full w-px origin-top bg-accent" />
         {experience.map((e) => (

@@ -26,10 +26,9 @@ Chosen by the owner (Yusuf). Future UI work on this repo follows this file, and 
 | One accent: `#e28a6d` in dark, `#9b2c1f` in light | Used for the primary button, the terminal prompt, `§` numbers, the timeline progress, and the request dot |
 | `§ n` numbered sections with a margin column | Identity motif: technical documents and RFCs number their sections |
 | Terminal keeps a dark surface in both themes | It is the one focal point of the hero |
-| Architecture diagram per project, drawn on scroll with a travelling request dot | Motion with a purpose: it shows the order data moves through the system. Scrubbed to scroll, never looping |
+| BPMN-style flow per project, app lane first, drawn on scroll | Owner request (2026-10-09): easier to read than a box diagram. Lanes are columns with the app's lane on the left; start event, steps, decisions, data stores, end event; solid = next step, dotted = reads/writes, dashed = outside service. A key under each diagram lists only the shapes it uses. Scrubbed to scroll, never looping |
 | Experience timeline line fills on scroll | Shows the reader where they are in the timeline |
-| "Inside a request" pinned section (desktop) | Scrolling moves one tournament registration (modelled on Badmintoon Portal) sideways through each layer of the stack, with a rail showing the current layer. It shows backend thinking instead of claiming it. Plain list on phones and with reduced motion |
-| Diagram nodes highlight their connections on hover/tap; "replay request" button | Lets the visitor trace the flow themselves instead of only watching it |
+| Diagram nodes highlight their connections on hover/tap; "replay flow" button | Lets the visitor trace the flow themselves instead of only watching it |
 | Skill explorer | Each skill shows the real projects and jobs that use it, computed from the data; an honest empty state when none do |
 | Name rises letter by letter on load; section titles slide in once | Sets the pace at the top of each part of the page, runs once |
 | Reading progress bar | Shows how much of the page is left |
@@ -46,3 +45,4 @@ Chosen by the owner (Yusuf). Future UI work on this repo follows this file, and 
 - No em dashes in copy.
 
 - Keep it short (owner, 2026-10-08: the site is sent with job applications, so HR should not have to wade through it). Match the CV PDF; at most 4 points per job and 3 per project.
+- No illustrative or example-only sections (owner, 2026-10-09: "Inside a request" removed). Backend thinking is shown through the real project diagrams instead.

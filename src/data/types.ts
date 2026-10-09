@@ -4,21 +4,33 @@ export interface SkillGroup {
 }
 
 /**
- * A small architecture diagram. Nodes sit on a grid (col 0-1, row 0-3);
- * edges connect node ids. Keep it to what the system really does.
+ * A small BPMN-style flow. Lanes are columns (the app's lane first); steps sit on
+ * a grid of lane x row and the flow reads top to bottom.
+ * Keep it to what the system really does.
  */
+export type FlowStepKind = "start" | "task" | "decision" | "data" | "end";
+
 export interface Diagram {
-  nodes: { id: string; label: string; note?: string; col: 0 | 1; row: number }[];
-  edges: { from: string; to: string; label?: string }[];
+  lanes: string[];
+  steps: { id: string; kind: FlowStepKind; label: string; lane: number; row: number }[];
+  /**
+   * sequence: the next step (solid). data: reads or writes a data store (dotted).
+   * message: a call to an outside service (dashed).
+   * route "hv" goes sideways first, then down; the default for a step in another
+   * lane and row is down first, then sideways.
+   */
+  flows: { from: string; to: string; label?: string; kind?: "sequence" | "data" | "message"; route?: "hv" | "vh" }[];
 }
 
-export type ProjectStatus = "in-progress" | "finished";
+export type ProjectStatus = "in-progress" | "in-review" | "finished";
 
 export interface Project {
   slug: string;
   name: string;
   year: string;
   status: ProjectStatus;
+  /** Optional short context shown next to the status, e.g. "company project" */
+  context?: string;
   /** One or two sentences: what the system does and who uses it */
   summary: string;
   /** What you built. Only list work you actually did. */
@@ -73,4 +85,12 @@ export interface Deployment {
   status: string;
   summary: string;
   diagram: Diagram;
+}
+
+/** A client website listed compactly (one line each), not as a full project card */
+export interface ClientSite {
+  name: string;
+  /** What the site is and what you did, in a few words */
+  note: string;
+  href?: string;
 }

@@ -47,7 +47,7 @@ const COMMANDS: Record<string, { about: string; run: () => ReactNode }> = {
           <div key={p.slug}>
             <span className="text-term-accent">{p.name}</span>{" "}
             <span className="text-term-muted">
-              {p.year}, {p.status === "finished" ? "finished" : "in progress"}, {p.stack.slice(0, 2).join(" + ")}
+              {p.year}, {p.status.replace("-", " ")}, {p.stack.slice(0, 2).join(" + ")}
             </span>
           </div>
         ))}
@@ -83,7 +83,7 @@ const COMMANDS: Record<string, { about: string; run: () => ReactNode }> = {
           {deployment.title} <span className="text-term-muted">({deployment.status})</span>
         </div>
         <div className="text-term-muted">
-          {deployment.diagram.nodes.map((n) => n.label).join(" -> ")}
+          {deployment.diagram.steps.map((n) => n.label).join(" -> ")}
         </div>
       </>
     ),
