@@ -56,6 +56,8 @@ export interface Experience {
   links?: { label: string; href: string }[];
   points: string[];
   stack: string[];
+  /** Skills used in this job that aren't tools (not shown as chips; the skill explorer links them here) */
+  skills?: string[];
 }
 
 export interface Certificate {
@@ -84,6 +86,8 @@ export interface Deployment {
   title: string;
   status: string;
   summary: string;
+  /** Tools in this setup, linked from the skill explorer */
+  stack: string[];
   diagram: Diagram;
 }
 

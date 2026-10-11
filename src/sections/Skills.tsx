@@ -15,7 +15,8 @@ function usage(skill: string) {
   const uses = (stack: string[]) => stack.some((s) => keys.includes(norm(s)));
   return {
     projects: projects.filter((p) => uses(p.stack)),
-    jobs: experience.filter((e) => uses(e.stack)),
+    jobs: experience.filter((e) => uses([...e.stack, ...(e.skills ?? [])])),
+    deployment: uses(deployment.stack) ? deployment : null,
   };
 }
 
@@ -75,7 +76,7 @@ export default function Skills() {
           <p className="font-mono text-[12px] text-muted">where it's used</p>
           <p className="mt-1 font-mono text-lg text-accent">{selected}</p>
 
-          {used.projects.length === 0 && used.jobs.length === 0 ? (
+          {used.projects.length === 0 && used.jobs.length === 0 && !used.deployment ? (
             <p data-use className="mt-4 text-[15px] text-muted">
               Not tied to a listed project or job yet. It's in my toolkit from day-to-day work and study.
             </p>
@@ -99,12 +100,20 @@ export default function Skills() {
                   </span>
                 </li>
               ))}
+              {used.deployment && (
+                <li data-use>
+                  <a href="#deployment" className="font-medium">
+                    {used.deployment.title}
+                  </a>
+                  <span className="block font-mono text-[12px] text-muted">deployment · {used.deployment.status}</span>
+                </li>
+              )}
             </ul>
           )}
         </div>
       </div>
 
-      <div className="mt-14 grid gap-8 border-t border-rule pt-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_26rem] xl:gap-20">
+      <div id="deployment" className="mt-14 grid scroll-mt-24 gap-8 border-t border-rule pt-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_26rem] xl:gap-20">
         <div>
           <p className="font-mono text-[13px] text-muted">deployment · {deployment.status}</p>
           <h3 className="mt-1 text-xl font-medium">{deployment.title}</h3>

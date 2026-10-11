@@ -2,7 +2,6 @@
  * All portfolio content lives in this file. Every section on the site and the
  * /cv page read from here, so updating content never means editing components.
  *
- * Search for "TODO" to find the parts that still need your input.
  * Write only things that are true: a missing section is better than a made-up one.
  */
 import type { Certificate, ClientSite, ContactLink, Deployment, Education, Experience, Project, SkillGroup } from "./types";
@@ -38,7 +37,7 @@ export const profile = {
   intro:
     "I build web applications with Laravel, React (Inertia.js), and PostgreSQL, and I look after the server side when something breaks: security incidents, hosting, and maintenance.",
   about: [
-    "8 months at CV Genta Sandi Mandiri (GSM Studio) building client websites and Laravel apps, and cleaning up hacked sites. Before that, a 6-month PHP internship at PT Javan Cipta Solusi.",
+    "8 months at CV Genta Sandi Mandiri (GSM Studio) building client websites and Laravel apps, and cleaning up hacked sites. Before that, a 6-month PHP internship at PT Javan Cipta Solusi. Used to working remotely and running several client projects in parallel.",
   ],
   /** Things you're learning right now. Leave empty to hide the line. */
   learning: ["Go", "Flutter", "Unity"] as string[],
@@ -235,9 +234,10 @@ export const experience: Experience[] = [
       "Built e-commerce and school LMS products in Laravel for Script Media",
       "Extended Laravel apps, including a WordPress-to-billing integration and backend changes to a store app",
       "Handled security incidents: removed malware and backdoors, closed the holes, restored hacked sites; troubleshot VPS, FTP, and database issues",
-      "Built client websites (media, organisations, culture, tourism) with WordPress and Elementor, from design to launch",
+      "Built client websites (media, organisations, culture, tourism) with WordPress and Elementor, from design to launch, including multilingual sites (Polylang) and old sites rebuilt on Custom Post Types and ACF",
     ],
-    stack: ["Laravel", "PHP", "Livewire", "WordPress", "MySQL"],
+    stack: ["Laravel", "PHP", "Livewire", "WordPress", "Elementor", "ACF", "Polylang", "MySQL"],
+    skills: ["Website security", "Server & VPS troubleshooting"],
   },
   {
     role: "WordPress Developer (training)",
@@ -247,7 +247,7 @@ export const experience: Experience[] = [
     start: "2026-02",
     end: "2026-04",
     points: ["Learned WordPress development end to end (themes, plugins, Elementor, Custom Post Types, ACF) on internal projects"],
-    stack: [],
+    stack: ["WordPress", "Elementor", "ACF"],
   },
   {
     role: "PHP Programmer (intern)",
@@ -262,7 +262,7 @@ export const experience: Experience[] = [
       "Wrote, tested, and shipped new features with the team",
       "Debugged and fixed issues in existing applications",
     ],
-    stack: ["Laravel", "PostgreSQL", "React (Inertia.js)"],
+    stack: ["Laravel", "PostgreSQL", "React (Inertia.js)", "RESTful API"],
   },
 ];
 
@@ -271,6 +271,7 @@ export const deployment: Deployment = {
   status: "live",
   summary:
     "My own projects run on a home server behind Cloudflare Tunnel: no open ports, no public IP.",
+  stack: ["Cloudflare Tunnel"],
   diagram: {
     lanes: ["Home server", "Cloudflare", "Visitor"],
     steps: [
