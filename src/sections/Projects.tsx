@@ -1,6 +1,5 @@
 import { clientSites, projects } from "../data/portfolio";
 import ArchDiagram from "../components/ArchDiagram";
-import ParallaxImage from "../components/ParallaxImage";
 import Section from "../components/Section";
 
 const STATUS_LABEL = { "in-progress": "in progress", "in-review": "in review", finished: "finished" } as const;
@@ -52,12 +51,6 @@ export default function Projects() {
                 <figure>
                   <ArchDiagram diagram={p.diagram} name={p.name} />
                   <figcaption className="mt-2 font-mono text-[12px] text-muted">how it's wired</figcaption>
-                </figure>
-              )}
-              {p.image && (
-                <figure>
-                  <ParallaxImage src={p.image} alt={`Screenshot of ${p.name}`} />
-                  <figcaption className="mt-2 font-mono text-[12px] text-muted">screenshot</figcaption>
                 </figure>
               )}
             </div>

@@ -32,7 +32,7 @@ Chosen by the owner (Yusuf). Future UI work on this repo follows this file, and 
 | Skill explorer | Each skill shows the real projects and jobs that use it, computed from the data; an honest empty state when none do |
 | Name rises letter by letter on load; section titles slide in once | Sets the pace at the top of each part of the page, runs once |
 | Reading progress bar | Shows how much of the page is left |
-| Screenshot parallax, certificate preview following the cursor (desktop) | Depth and a quick look without opening the dialog |
+| Certificate preview following the cursor (desktop) | A quick look without opening the dialog |
 | Sticky header with active-section highlight | Navigation stays one click away on a long page, and shows where the reader is |
 | Mobile menu as a side drawer | Owner request; numbered like the sections, closes on link tap, Escape, or backdrop tap, and locks page scroll while open |
 | All motion off under `prefers-reduced-motion` | Diagrams and timeline render complete and static |

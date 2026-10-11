@@ -10,8 +10,6 @@ import portrait from "../assets/images/avatar.webp";
 import photoCv from "../assets/images/photo-cv.jpg";
 import cvFile from "../assets/files/cv-yusuf-novandra.pdf";
 
-import badmintoonImg from "../assets/projects/Badmintoon.jpg";
-
 import certBootcamp from "../assets/certificates/BootcampFE.png";
 import certBootcampPdf from "../assets/certificates/bootcamp.pdf";
 import certInternship from "../assets/certificates/InternshipJavan.png";
@@ -183,7 +181,6 @@ export const projects: Project[] = [
       "Relational database design in PostgreSQL",
     ],
     stack: ["Laravel", "PostgreSQL", "React (Inertia.js)"],
-    image: badmintoonImg,
     diagram: {
       lanes: ["Laravel", "PostgreSQL", "React"],
       steps: [
@@ -262,7 +259,7 @@ export const experience: Experience[] = [
       "Wrote, tested, and shipped new features with the team",
       "Debugged and fixed issues in existing applications",
     ],
-    stack: ["Laravel", "PostgreSQL", "React (Inertia.js)", "RESTful API"],
+    stack: ["Laravel", "PHP", "Livewire", "PostgreSQL", "React (Inertia.js)", "RESTful API", "Midtrans"],
   },
 ];
 

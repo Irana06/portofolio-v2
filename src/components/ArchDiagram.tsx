@@ -190,13 +190,14 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
       });
 
       diagram.flows.forEach((f, i) => {
-        const target = nodes.find((n) => n.dataset.node === f.to);
+        // light both ends: a data store that only feeds a step (never a target) must light up too
+        const ends = nodes.filter((n) => n.dataset.node === f.to || n.dataset.node === f.from);
         tl.to(masks[i], { strokeDashoffset: 0, duration: 1, ease: "none" })
           .set(dot, { opacity: 1 }, "<")
           .to(dot, { duration: 1, ease: "none", motionPath: { path: paths[i], align: paths[i], alignOrigin: [0.5, 0.5] } }, "<")
           .to(svg.querySelectorAll(`[data-edge-label="${i}"]`), { opacity: 1, duration: 0.3 }, "<0.4")
           .to(heads[i], { opacity: 1, duration: 0.15 }, ">-0.15")
-          .to(target ?? {}, { opacity: 1, duration: 0.3 }, "<");
+          .to(ends, { opacity: 1, duration: 0.3 }, "<");
       });
       tl.to(dot, { opacity: 0, duration: 0.3 });
       return () => setCanMove(false);

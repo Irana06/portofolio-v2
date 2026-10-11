@@ -36,7 +36,6 @@ export interface Project {
   /** What you built. Only list work you actually did. */
   work: string[];
   stack: string[];
-  image?: string;
   diagram?: Diagram;
   links?: { label: string; href: string }[];
 }
