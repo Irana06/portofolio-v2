@@ -169,6 +169,7 @@ export const projects: Project[] = [
       ],
     },
     links: [{ label: "Source", href: "https://github.com/Irana06/monshika" }],
+    release: "Irana06/monshika",
   },
   {
     slug: "badmintoon-portal",

@@ -1,5 +1,6 @@
 import { clientSites, projects } from "../data/portfolio";
 import ArchDiagram from "../components/ArchDiagram";
+import LatestRelease from "../components/LatestRelease";
 import Section from "../components/Section";
 
 const STATUS_LABEL = { "in-progress": "in progress", "in-review": "in review", finished: "finished" } as const;
@@ -34,6 +35,8 @@ export default function Projects() {
                   </span>
                 ))}
               </p>
+
+              {p.release && <LatestRelease repo={p.release} />}
 
               {p.links && p.links.length > 0 && (
                 <p className="mt-4 flex flex-wrap gap-x-5 font-sans text-sm">

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { contactLinks, deployment, experience, profile, projects, skills } from "../data/portfolio";
 import { formatYm } from "../lib/format";
+import { snapPage } from "../lib/snap";
 
 type Line = { id: number; kind: "in" | "out" | "err"; body: ReactNode };
 
@@ -174,7 +175,7 @@ export default function Terminal() {
       return;
     }
     const entry: Line = { id: nextId++, kind: "in", body: cmd };
-    // Easter egg (not listed in help): the classic "delete everything" command does nothing here.
+    // Easter egg (not listed in help): "rm -rf /" makes the page vanish for a few seconds.
     if (/^(sudo\s+)?rm\s+-(rf|fr)\b.*\s\/\*?$/.test(cmd)) {
       const out: Line = {
         id: nextId++,
@@ -182,11 +183,17 @@ export default function Terminal() {
         body: (
           <>
             {cmd.startsWith("sudo") && <div className="text-term-muted">[sudo] password for guest: ********</div>}
-            <div>Permission denied. Nice try: this terminal is read-only, nothing was deleted.</div>
+            <div>removing everything...</div>
           </>
         ),
       };
       setLines((prev) => [...prev, entry, out]);
+      snapPage(() =>
+        setLines((prev) => [
+          ...prev,
+          { id: nextId++, kind: "out", body: "...and it's all back. Nice try: this terminal is read-only, nothing was deleted." },
+        ]),
+      );
       return;
     }
     const found = COMMANDS[cmd];

@@ -38,6 +38,8 @@ export interface Project {
   stack: string[];
   diagram?: Diagram;
   links?: { label: string; href: string }[];
+  /** "owner/repo": show download buttons for the newest GitHub release */
+  release?: string;
 }
 
 export interface Experience {
