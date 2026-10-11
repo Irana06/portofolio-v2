@@ -58,7 +58,7 @@ export const skills: SkillGroup[] = [
   { label: "WordPress", items: ["WordPress", "Elementor", "ACF", "Polylang"] },
   { label: "Frontend", items: ["React (Inertia.js)", "JavaScript", "TypeScript", "Tailwind CSS"] },
   { label: "Code and deploy", items: ["Git", "GitHub", "GitLab", "Docker", "Railway"] },
-  { label: "Daily tools", items: ["VS Code", "Postman", "DBeaver", "FileZilla", "Claude Code"] },
+  { label: "Daily tools", items: ["VS Code", "Postman", "Apidog", "DBeaver", "FileZilla", "Claude Code", "Codex"] },
 ];
 
 export const projects: Project[] = [
@@ -181,7 +181,7 @@ export const projects: Project[] = [
       "Authentication with role-based access control",
       "Relational database design in PostgreSQL",
     ],
-    stack: ["Laravel", "PostgreSQL", "React (Inertia.js)"],
+    stack: ["Laravel", "PostgreSQL", "React (Inertia.js)", "TypeScript"],
     diagram: {
       lanes: ["Laravel", "PostgreSQL", "React"],
       steps: [
@@ -260,7 +260,8 @@ export const experience: Experience[] = [
       "Wrote, tested, and shipped new features with the team",
       "Debugged and fixed issues in existing applications",
     ],
-    stack: ["Laravel", "PHP", "Livewire", "PostgreSQL", "React (Inertia.js)", "RESTful API", "Midtrans"],
+    stack: ["Laravel", "PHP", "Livewire", "PostgreSQL", "React (Inertia.js)", "TypeScript", "RESTful API", "Midtrans"],
+    skills: ["GitLab", "Docker", "Postman", "Apidog", "DBeaver"],
   },
 ];
 
