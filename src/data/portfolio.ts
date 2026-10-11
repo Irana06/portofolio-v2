@@ -54,10 +54,11 @@ export const contactFormEndpoint = "https://formspree.io/f/mpwyzgrn";
 export const skills: SkillGroup[] = [
   { label: "Backend", items: ["PHP", "Laravel", "Livewire", "RESTful API", "Payment gateway (Midtrans)"] },
   { label: "Data", items: ["PostgreSQL", "MySQL"] },
-  { label: "Servers and security", items: ["Website security", "Server & VPS troubleshooting", "Cloudflare Tunnel"] },
+  { label: "Servers and security", items: ["Website security", "Server & VPS troubleshooting", "Ubuntu", "Cloudflare Tunnel"] },
   { label: "WordPress", items: ["WordPress", "Elementor", "ACF", "Polylang"] },
-  { label: "Frontend", items: ["React (Inertia.js)", "JavaScript"] },
-  { label: "Tools", items: ["Git", "Railway", "Claude Code"] },
+  { label: "Frontend", items: ["React (Inertia.js)", "JavaScript", "TypeScript", "Tailwind CSS"] },
+  { label: "Code and deploy", items: ["Git", "GitHub", "GitLab", "Docker", "Railway"] },
+  { label: "Daily tools", items: ["VS Code", "Postman", "DBeaver", "FileZilla", "Claude Code"] },
 ];
 
 export const projects: Project[] = [
@@ -234,7 +235,7 @@ export const experience: Experience[] = [
       "Built client websites (media, organisations, culture, tourism) with WordPress and Elementor, from design to launch, including multilingual sites (Polylang) and old sites rebuilt on Custom Post Types and ACF",
     ],
     stack: ["Laravel", "PHP", "Livewire", "WordPress", "Elementor", "ACF", "Polylang", "MySQL"],
-    skills: ["Website security", "Server & VPS troubleshooting"],
+    skills: ["Website security", "Server & VPS troubleshooting", "FileZilla"],
   },
   {
     role: "WordPress Developer (training)",
