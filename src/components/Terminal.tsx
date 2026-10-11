@@ -6,6 +6,7 @@ import { snapPage } from "../lib/snap";
 type Line = { id: number; kind: "in" | "out" | "err"; body: ReactNode };
 
 const PROMPT = "guest@yusuf:~$";
+const SNAP = "sudo rm -rf --no-preserve-root /";
 
 const COMMANDS: Record<string, { about: string; run: () => ReactNode }> = {
   help: {
@@ -19,6 +20,10 @@ const COMMANDS: Record<string, { about: string; run: () => ReactNode }> = {
               <td>{c.about}</td>
             </tr>
           ))}
+          <tr>
+            <td className="pr-6 text-term-accent">{SNAP}</td>
+            <td>delete everything (try it)</td>
+          </tr>
           <tr>
             <td className="pr-6 text-term-accent">clear</td>
             <td>clear the terminal</td>
@@ -175,7 +180,7 @@ export default function Terminal() {
       return;
     }
     const entry: Line = { id: nextId++, kind: "in", body: cmd };
-    // Easter egg (not listed in help): "rm -rf /" makes the page vanish for a few seconds.
+    // "rm -rf /" (listed in help, with its own button) makes the page vanish for a few seconds.
     if (/^(sudo\s+)?rm\s+-(rf|fr)\b.*\s\/\*?$/.test(cmd)) {
       const out: Line = {
         id: nextId++,
@@ -290,6 +295,13 @@ export default function Terminal() {
             {c}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => run(SNAP)}
+          className="min-h-[44px] rounded-sm border border-term-accent/60 px-3 text-[12px] text-term-accent transition-colors hover:border-term-accent focus-visible:border-term-accent"
+        >
+          {SNAP}
+        </button>
       </div>
     </div>
   );
