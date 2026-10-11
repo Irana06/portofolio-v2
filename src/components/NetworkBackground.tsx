@@ -107,7 +107,8 @@ export default function NetworkBackground() {
     };
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Phones get a lighter canvas: fewer pixels to redraw on every frame while scrolling.
+      const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1.5 : 2);
       w = window.innerWidth;
       h = window.innerHeight;
       el.width = w * dpr;

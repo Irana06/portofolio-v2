@@ -20,7 +20,7 @@ const COMMANDS: Record<string, { about: string; run: () => ReactNode }> = {
           ))}
           <tr>
             <td className="pr-6 text-term-accent">clear</td>
-            <td>clear the screen</td>
+            <td>clear the terminal</td>
           </tr>
         </tbody>
       </table>
@@ -174,6 +174,21 @@ export default function Terminal() {
       return;
     }
     const entry: Line = { id: nextId++, kind: "in", body: cmd };
+    // Easter egg (not listed in help): the classic "delete everything" command does nothing here.
+    if (/^(sudo\s+)?rm\s+-(rf|fr)\b.*\s\/\*?$/.test(cmd)) {
+      const out: Line = {
+        id: nextId++,
+        kind: "err",
+        body: (
+          <>
+            {cmd.startsWith("sudo") && <div className="text-term-muted">[sudo] password for guest: ********</div>}
+            <div>Permission denied. Nice try: this terminal is read-only, nothing was deleted.</div>
+          </>
+        ),
+      };
+      setLines((prev) => [...prev, entry, out]);
+      return;
+    }
     const found = COMMANDS[cmd];
     const result: Line = found
       ? { id: nextId++, kind: "out", body: found.run() }

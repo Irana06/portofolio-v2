@@ -157,7 +157,7 @@ export default function Header() {
     <>
       <header
         className={`sticky top-0 z-30 border-b transition-colors duration-300 ${
-          scrolled ? "border-rule bg-paper/85 backdrop-blur-md" : "border-transparent"
+          scrolled ? "border-rule bg-paper/95 md:bg-paper/85 md:backdrop-blur-md" : "border-transparent"
         }`}
       >
         <div className="page flex min-h-[4.5rem] items-center justify-between gap-6">

@@ -1,4 +1,4 @@
-import { useId, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import type { Diagram, FlowStepKind } from "../data/types";
 import { gsap } from "../lib/gsap";
 
@@ -52,7 +52,6 @@ function Lines({ lines, x, y, anchor, className, size = 10.5 }: { lines: string[
  */
 export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name: string }) {
   const root = useRef<SVGSVGElement>(null);
-  const uid = useId().replace(/:/g, "");
   const [active, setActive] = useState<string | null>(null);
   const [canMove, setCanMove] = useState(false);
 
@@ -169,7 +168,7 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       setCanMove(true);
-      const masks = gsap.utils.toArray<SVGPathElement>(svg.querySelectorAll("[data-edge-mask]"));
+      const lines = gsap.utils.toArray<SVGGElement>(svg.querySelectorAll("[data-edge-line]"));
       const paths = gsap.utils.toArray<SVGPathElement>(svg.querySelectorAll("[data-edge]"));
       const heads = gsap.utils.toArray<SVGElement>(svg.querySelectorAll("[data-head]"));
       const labels = gsap.utils.toArray<SVGElement>(svg.querySelectorAll("[data-edge-label]"));
@@ -177,29 +176,28 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
       const dot = svg.querySelector<SVGCircleElement>("[data-dot]");
       const first = diagram.flows[0]?.from;
 
-      masks.forEach((p) => {
-        const len = p.getTotalLength();
-        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
-      });
       gsap.set(nodes.filter((n) => n.dataset.node !== first), { opacity: 0.25 });
-      gsap.set([...labels, ...heads], { opacity: 0 });
+      gsap.set([...lines, ...labels, ...heads], { opacity: 0 });
       gsap.set(dot, { opacity: 0 });
 
+      // Plays once when the diagram comes into view. Not scrubbed and no SVG masks:
+      // repainting masked paths on every scroll frame made phones lag.
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: svg, start: "top 85%", end: "bottom 45%", scrub: 0.6 },
+        defaults: { ease: "none" },
+        scrollTrigger: { trigger: svg, start: "top 75%", once: true },
       });
 
       diagram.flows.forEach((f, i) => {
         // light both ends: a data store that only feeds a step (never a target) must light up too
         const ends = nodes.filter((n) => n.dataset.node === f.to || n.dataset.node === f.from);
-        tl.to(masks[i], { strokeDashoffset: 0, duration: 1, ease: "none" })
+        tl.to(lines[i], { opacity: 1, duration: 0.2 })
           .set(dot, { opacity: 1 }, "<")
-          .to(dot, { duration: 1, ease: "none", motionPath: { path: paths[i], align: paths[i], alignOrigin: [0.5, 0.5] } }, "<")
-          .to(svg.querySelectorAll(`[data-edge-label="${i}"]`), { opacity: 1, duration: 0.3 }, "<0.4")
-          .to(heads[i], { opacity: 1, duration: 0.15 }, ">-0.15")
-          .to(ends, { opacity: 1, duration: 0.3 }, "<");
+          .to(dot, { duration: 0.45, ease: "power1.inOut", motionPath: { path: paths[i], align: paths[i], alignOrigin: [0.5, 0.5] } }, "<")
+          .to(svg.querySelectorAll(`[data-edge-label="${i}"]`), { opacity: 1, duration: 0.2 }, "<0.15")
+          .to(heads[i], { opacity: 1, duration: 0.1 }, ">-0.1")
+          .to(ends, { opacity: 1, duration: 0.2 }, "<");
       });
-      tl.to(dot, { opacity: 0, duration: 0.3 });
+      tl.to(dot, { opacity: 0, duration: 0.2 });
       return () => setCanMove(false);
     });
 
@@ -212,8 +210,7 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
     if (!svg) return;
     const paths = gsap.utils.toArray<SVGPathElement>(svg.querySelectorAll("[data-edge]"));
     const dot = svg.querySelector<SVGCircleElement>("[data-replay-dot]");
-    gsap.set(svg.querySelectorAll("[data-edge-mask]"), { strokeDashoffset: 0 });
-    gsap.set(svg.querySelectorAll("[data-node],[data-edge-label],[data-head]"), { opacity: 1 });
+    gsap.set(svg.querySelectorAll("[data-node],[data-edge-line],[data-edge-label],[data-head]"), { opacity: 1 });
     const tl = gsap.timeline();
     tl.set(dot, { opacity: 1 });
     paths.forEach((p, i) => {
@@ -246,20 +243,12 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
         <line x1={0} y1={HEAD} x2={W} y2={HEAD} className="stroke-rule" />
         <rect x={0.5} y={0.5} width={W - 1} height={H - 1} rx={6} fill="none" className="stroke-rule" />
 
-        <defs>
-          {flows.map((f, i) => (
-            <mask key={i} id={`${uid}-m${i}`} maskUnits="userSpaceOnUse" x={0} y={0} width={W} height={H}>
-              <path data-edge-mask d={f.d} fill="none" stroke="white" strokeWidth={8} />
-            </mask>
-          ))}
-        </defs>
-
         {flows.map((f, i) => {
           const on = lit(f.from, f.to);
           const stroke = on ? "stroke-accent" : "stroke-edge";
           return (
             <g key={`${f.from}-${f.to}`}>
-              <g mask={`url(#${uid}-m${i})`}>
+              <g data-edge-line>
                 <path
                   data-edge
                   d={f.d}
