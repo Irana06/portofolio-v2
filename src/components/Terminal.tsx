@@ -144,6 +144,23 @@ const SUGGESTED = ["help", "whoami", "projects", "stack", "deploy", "contact"];
 
 let nextId = 0;
 
+/** The fake "rm -v" output for the snap joke, built from this site's own sections and projects. */
+function snapLog(): string[] {
+  const site = "/var/www/yushika.my.id";
+  return [
+    `removed '${site}/index.html'`,
+    ...projects.map((p) => `removed directory '${site}/projects/${p.slug}'`),
+    `removed directory '${site}/experience'`,
+    `removed directory '${site}/skills'`,
+    `removed directory '${site}/certificates'`,
+    `removed '${site}/cv-yusuf-novandra.pdf'`,
+    "removed '/etc/cloudflared/config.yml'",
+    "removed directory '/home/yusuf'",
+    "removed directory '/usr/bin'",
+    "removed directory '/bin'",
+  ];
+}
+
 export default function Terminal() {
   const [lines, setLines] = useState<Line[]>([
     {
@@ -158,6 +175,7 @@ export default function Terminal() {
     },
   ]);
   const [value, setValue] = useState("");
+  const snapping = useRef(false);
   const history = useRef<string[]>([]);
   const cursor = useRef(0);
   const screen = useRef<HTMLDivElement>(null);
@@ -180,7 +198,7 @@ export default function Terminal() {
       return;
     }
     const entry: Line = { id: nextId++, kind: "in", body: cmd };
-    // "rm -rf /" (listed in help, with its own button) makes the page vanish for a few seconds.
+    // "rm -rf /" (listed in help) makes the page vanish for a few seconds while a verbose rm log scrolls by.
     if (/^(sudo\s+)?rm\s+-(rf|fr)\b.*\s\/\*?$/.test(cmd)) {
       const out: Line = {
         id: nextId++,
@@ -188,17 +206,28 @@ export default function Terminal() {
         body: (
           <>
             {cmd.startsWith("sudo") && <div className="text-term-muted">[sudo] password for guest: ********</div>}
-            <div>removing everything...</div>
+            <div>rm: removing everything under '/'</div>
           </>
         ),
       };
       setLines((prev) => [...prev, entry, out]);
-      snapPage(() =>
+      if (snapping.current) return;
+      snapping.current = true;
+      const paths = snapLog();
+      const step = 140;
+      paths.forEach((path, k) =>
+        setTimeout(() => setLines((prev) => [...prev, { id: nextId++, kind: "out", body: path }]), 300 + k * step),
+      );
+      setTimeout(() => {
+        setLines((prev) => [...prev, { id: nextId++, kind: "err", body: "rm: everything is gone." }]);
+      }, 300 + paths.length * step);
+      snapPage(() => {
+        snapping.current = false;
         setLines((prev) => [
           ...prev,
           { id: nextId++, kind: "out", body: "...and it's all back. Nice try: this terminal is read-only, nothing was deleted." },
-        ]),
-      );
+        ]);
+      });
       return;
     }
     const found = COMMANDS[cmd];
@@ -235,7 +264,7 @@ export default function Terminal() {
   }
 
   return (
-    <div className="overflow-hidden rounded-md border border-term-rule bg-term-bg font-mono text-[13px] leading-6 text-term-ink shadow-[0_24px_60px_-30px_rgba(0,0,0,0.7)]">
+    <div data-snap-keep className="overflow-hidden rounded-md border border-term-rule bg-term-bg font-mono text-[13px] leading-6 text-term-ink shadow-[0_24px_60px_-30px_rgba(0,0,0,0.7)]">
       <div className="flex items-center justify-between border-b border-term-rule px-4 py-2 text-[12px] text-term-muted">
         <span>terminal</span>
         <span>try: help</span>
@@ -247,7 +276,7 @@ export default function Terminal() {
           // Mouse users can click anywhere to type; on touch this would pop the keyboard unasked.
           if (window.matchMedia("(pointer: fine)").matches) input.current?.focus({ preventScroll: true });
         }}
-        className="h-[19rem] overflow-y-auto px-4 py-3 sm:h-[21rem]"
+        className="h-[19rem] overflow-y-auto px-4 py-3 [overflow-wrap:anywhere] sm:h-[21rem]"
         role="log"
         aria-live="polite"
         aria-label="Terminal output"
@@ -290,18 +319,15 @@ export default function Terminal() {
             key={c}
             type="button"
             onClick={() => run(c)}
-            className="min-h-[44px] rounded-sm border border-term-rule px-3 text-[12px] text-term-muted transition-colors hover:border-term-muted hover:text-term-ink focus-visible:text-term-ink"
+            className={`min-h-[44px] rounded-sm border px-3 text-[12px] transition-colors ${
+              c === "help"
+                ? "border-term-accent/60 text-term-accent hover:border-term-accent"
+                : "border-term-rule text-term-muted hover:border-term-muted hover:text-term-ink focus-visible:text-term-ink"
+            }`}
           >
             {c}
           </button>
         ))}
-        <button
-          type="button"
-          onClick={() => run(SNAP)}
-          className="min-h-[44px] rounded-sm border border-term-accent/60 px-3 text-[12px] text-term-accent transition-colors hover:border-term-accent focus-visible:border-term-accent"
-        >
-          {SNAP}
-        </button>
       </div>
     </div>
   );

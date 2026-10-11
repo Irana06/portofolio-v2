@@ -55,7 +55,7 @@ export default function Intro() {
         </p>
       </div>
 
-      <div data-terminal className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
+      <div data-terminal className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
         <Terminal />
       </div>
 

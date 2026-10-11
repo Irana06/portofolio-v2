@@ -18,16 +18,30 @@ export function snapPage(onBack: () => void) {
   };
   // Outermost matching pieces only, so a link inside a list item doesn't move twice.
   const all = [...document.querySelectorAll<HTMLElement>(`:is(header, main, footer) :is(${PIECES})`)];
-  const pieces = all.filter((el) => inView(el) && !all.some((other) => other !== el && other.contains(el)));
+  const pieces = all.filter(
+    (el) => inView(el) && !el.closest("[data-snap-keep]") && !all.some((other) => other !== el && other.contains(el)),
+  );
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const root = document.documentElement;
-  const prevOverflow = root.style.overflow;
-  root.style.overflow = "hidden"; // keep what vanished on screen until it returns
+  // Hold the scroll position without hiding the scrollbar (hiding it shifts the whole layout),
+  // and clip pieces drifting past the right edge so no horizontal scrollbar appears.
+  const block = (e: Event) => e.preventDefault();
+  const keys = (e: KeyboardEvent) => {
+    if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key) && !(e.target instanceof HTMLInputElement)) e.preventDefault();
+  };
+  window.addEventListener("wheel", block, { passive: false });
+  window.addEventListener("touchmove", block, { passive: false });
+  window.addEventListener("keydown", keys);
+  const clipped = [document.documentElement, document.body];
+  const prevOverflowX = clipped.map((el) => el.style.overflowX);
+  clipped.forEach((el) => (el.style.overflowX = "clip"));
 
   const finish = () => {
     gsap.set(pieces, { clearProps: "opacity,transform,filter" });
-    root.style.overflow = prevOverflow;
+    window.removeEventListener("wheel", block);
+    window.removeEventListener("touchmove", block);
+    window.removeEventListener("keydown", keys);
+    clipped.forEach((el, k) => (el.style.overflowX = prevOverflowX[k]));
     running = false;
     onBack();
   };
