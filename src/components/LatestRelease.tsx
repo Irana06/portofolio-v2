@@ -3,6 +3,30 @@ import { useEffect, useState } from "react";
 type Asset = { name: string; size: number; browser_download_url: string };
 type Release = { tag_name: string; published_at: string; html_url: string; assets: Asset[] };
 
+/** Where to read the newest release: a repo's GitHub releases, or a Shicomp apps hub manifest. */
+export type ReleaseSource = string | { manifest: string; page: string };
+
+type HubManifest = {
+  latest?: { version: string; publishedAt: string; pageUrl: string; apks: { name: string; url: string; size: number }[] };
+};
+
+async function loadRelease(source: ReleaseSource): Promise<Release | null> {
+  if (typeof source === "string") {
+    const r = await fetch(`https://api.github.com/repos/${source}/releases/latest`, { headers: { Accept: "application/vnd.github+json" } });
+    const data = r.ok ? ((await r.json()) as Release) : null;
+    return data?.assets ? data : null;
+  }
+  const r = await fetch(source.manifest);
+  const latest = r.ok ? ((await r.json()) as HubManifest).latest : undefined;
+  if (!latest?.apks) return null;
+  return {
+    tag_name: `v${latest.version}`,
+    published_at: latest.publishedAt,
+    html_url: latest.pageUrl,
+    assets: latest.apks.map((a) => ({ name: a.name, size: a.size, browser_download_url: a.url })),
+  };
+}
+
 /** Which phones each split APK is for, read from the file name. */
 function abi(name: string): { label: string; note: string; order: number } {
   const n = name.toLowerCase();
@@ -15,16 +39,16 @@ function abi(name: string): { label: string; note: string; order: number } {
 const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 
 /**
- * Download buttons for the newest GitHub release of a repo, fetched in the
- * visitor's browser so a new release shows up without redeploying the site.
- * If GitHub can't be reached, a plain link to the releases page remains.
+ * Download buttons for the newest release, fetched in the visitor's browser so a
+ * new release shows up without redeploying the site. If it can't be reached, a
+ * plain link to the releases page remains.
  */
-export default function LatestRelease({ repo }: { repo: string }) {
-  const releasesUrl = `https://github.com/${repo}/releases`;
+export default function LatestRelease({ source }: { source: ReleaseSource }) {
+  const releasesUrl = typeof source === "string" ? `https://github.com/${source}/releases` : source.page;
+  const key = `release:${typeof source === "string" ? source : source.manifest}`;
   const [release, setRelease] = useState<Release | null>(null);
 
   useEffect(() => {
-    const key = `release:${repo}`;
     try {
       const cached = sessionStorage.getItem(key);
       if (cached) {
@@ -35,10 +59,9 @@ export default function LatestRelease({ repo }: { repo: string }) {
       /* storage blocked: just fetch */
     }
     let alive = true;
-    fetch(`https://api.github.com/repos/${repo}/releases/latest`, { headers: { Accept: "application/vnd.github+json" } })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: Release | null) => {
-        if (!alive || !data?.assets) return;
+    loadRelease(source)
+      .then((data) => {
+        if (!alive || !data) return;
         setRelease(data);
         try {
           sessionStorage.setItem(key, JSON.stringify(data));
@@ -50,7 +73,9 @@ export default function LatestRelease({ repo }: { repo: string }) {
     return () => {
       alive = false;
     };
-  }, [repo]);
+    // `key` identifies the source; the object itself is recreated on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   const apks = (release?.assets ?? [])
     .filter((a) => a.name.toLowerCase().endsWith(".apk"))
@@ -89,7 +114,13 @@ export default function LatestRelease({ repo }: { repo: string }) {
         </ul>
       ) : null}
       <a href={releasesUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-[44px] items-center font-sans text-sm">
-        {apks.length > 0 ? "All releases on GitHub" : "Download from GitHub Releases"}
+        {typeof source === "string"
+          ? apks.length > 0
+            ? "All releases on GitHub"
+            : "Download from GitHub Releases"
+          : apks.length > 0
+            ? "Download page"
+            : "Open the download page"}
       </a>
     </div>
   );

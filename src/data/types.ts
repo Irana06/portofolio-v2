@@ -38,8 +38,11 @@ export interface Project {
   stack: string[];
   diagram?: Diagram;
   links?: { label: string; href: string }[];
-  /** "owner/repo": show download buttons for the newest GitHub release */
-  release?: string;
+  /**
+   * Download buttons for the newest release: "owner/repo" for GitHub releases,
+   * or a Shicomp apps hub manifest URL plus its download page.
+   */
+  release?: string | { manifest: string; page: string };
 }
 
 export interface Experience {

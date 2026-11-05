@@ -57,7 +57,7 @@ export const skills: SkillGroup[] = [
   { label: "Servers and security", items: ["Website security", "Server & VPS troubleshooting", "Ubuntu", "Cloudflare Tunnel"] },
   { label: "WordPress", items: ["WordPress", "Elementor", "ACF", "Polylang"] },
   { label: "Frontend", items: ["React (Inertia.js)", "JavaScript", "TypeScript", "Tailwind CSS"] },
-  { label: "Code and deploy", items: ["Git", "GitHub", "GitLab", "Docker", "Railway"] },
+  { label: "Code and deploy", items: ["Git", "GitHub", "GitHub Actions", "GitLab", "Docker", "Railway"] },
   { label: "Daily tools", items: ["VS Code", "Postman", "Apidog", "DBeaver", "FileZilla", "Claude Code", "Codex"] },
 ];
 
@@ -132,6 +132,47 @@ export const projects: Project[] = [
       ],
     },
     links: [],
+  },
+  {
+    slug: "otosora",
+    name: "Otosora",
+    year: "2026",
+    status: "in-progress",
+    context: "own product, Shicomp (my business)",
+    summary:
+      "Ad-free Android music player (Flutter): songs on the phone, YouTube Music streaming, and downloads in one app.",
+    work: [
+      "Background playback with lock-screen, notification, and headset controls; reopens on the last song at the same position",
+      "YouTube Music search, artist pages, radio, and autoplay; share-to-download with yt-dlp; listening stats in SQLite (Drift)",
+      "Release pipeline: a version tag builds signed APKs per ABI and publishes them to a public hub that the in-app updater reads",
+    ],
+    stack: ["Flutter", "Riverpod", "SQLite (Drift)", "just_audio", "GitHub Actions"],
+    diagram: {
+      lanes: ["Flutter app", "On device", "YouTube Music"],
+      steps: [
+        { id: "start", kind: "start", label: "User picks a song", lane: 0, row: 0 },
+        { id: "local", kind: "decision", label: "On phone?", lane: 0, row: 1 },
+        { id: "stream", kind: "task", label: "Get the audio stream", lane: 2, row: 1 },
+        { id: "play", kind: "task", label: "Play in the background", lane: 0, row: 2 },
+        { id: "count", kind: "task", label: "Count the play after 30 s", lane: 0, row: 3 },
+        { id: "db", kind: "data", label: "SQLite (Drift)", lane: 1, row: 3 },
+        { id: "end", kind: "end", label: "Stats & autoplay", lane: 0, row: 4 },
+      ],
+      flows: [
+        { from: "start", to: "local" },
+        { from: "local", to: "play", label: "yes" },
+        { from: "local", to: "stream", label: "no" },
+        { from: "stream", to: "play", kind: "message", label: "stream" },
+        { from: "play", to: "count" },
+        { from: "count", to: "db", kind: "data", label: "save" },
+        { from: "count", to: "end" },
+      ],
+    },
+    links: [],
+    release: {
+      manifest: "https://irana06.github.io/shicomp-apps/apps/otosora.json",
+      page: "https://irana06.github.io/shicomp-apps/",
+    },
   },
   {
     slug: "monshika",

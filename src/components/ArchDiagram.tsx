@@ -103,10 +103,21 @@ export default function ArchDiagram({ diagram, name }: { diagram: Diagram; name:
       // straight down the lane; use the narrower shape's x so the line stays straight
       const x = narrow(a.kind) ? a.ax : narrow(b.kind) ? b.ax : a.ax;
       const down = b.cy > a.cy;
-      pts = [
-        [x, down ? a.bottom : a.top],
-        [x, down ? b.top : b.bottom],
-      ];
+      if (narrow(a.kind) && narrow(b.kind) && a.ax !== b.ax) {
+        // two narrow shapes at different x (an event above a decision): step across halfway
+        const mid = ((down ? a.bottom : a.top) + (down ? b.top : b.bottom)) / 2;
+        pts = [
+          [a.ax, down ? a.bottom : a.top],
+          [a.ax, mid],
+          [b.ax, mid],
+          [b.ax, down ? b.top : b.bottom],
+        ];
+      } else {
+        pts = [
+          [x, down ? a.bottom : a.top],
+          [x, down ? b.top : b.bottom],
+        ];
+      }
       lx = x + 6;
       ly = (pts[0][1] + pts[1][1]) / 2 + 3;
       la = "start";

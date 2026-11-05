@@ -36,7 +36,7 @@ export default function Projects() {
                 ))}
               </p>
 
-              {p.release && <LatestRelease repo={p.release} />}
+              {p.release && <LatestRelease source={p.release} />}
 
               {p.links && p.links.length > 0 && (
                 <p className="mt-4 flex flex-wrap gap-x-5 font-sans text-sm">
